@@ -15,7 +15,14 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } from "@/components/ui/chart";
-import { CountdownTimer, MAX_TIMER_SECONDS } from "./tool-widgets";
+import {
+  CountdownTimer,
+  MAX_TIMER_SECONDS,
+  WeatherCard,
+  WorldClock,
+  fetchWeather,
+  type ClockZone,
+} from "./tool-widgets";
 import { BreathingExercise, HelplineCard } from "./dostify-widgets";
 
 /**
@@ -289,6 +296,47 @@ export function PersonaFrontendTools() {
       "Show a guided 4-7-8 breathing exercise (4 rounds) in the chat. Offer it when the user is stressed, anxious or overwhelmed and wants to calm down.",
     parameters: { type: "object", properties: {} },
     render: () => <BreathingExercise />,
+  });
+
+  useFrontendTool<{ city?: string }>({
+    name: "get_weather",
+    description:
+      "Current weather and a 3-day forecast, shown to the user as a weather card. Pass `city` (e.g. \"Patna\", \"London\"); omit it for the user's own location (the browser asks them for permission). Temperatures are in °C.",
+    parameters: {
+      type: "object",
+      properties: {
+        city: { type: "string", description: "City name. Omit for the user's current location." },
+      },
+    },
+    // Data comes from Open-Meteo (free, no key), fetched straight from the browser.
+    handler: ({ city }) => fetchWeather(city),
+    render: ({ args, status, result, isError }) => (
+      <WeatherCard city={args.city} status={status} result={result} isError={isError} />
+    ),
+  });
+
+  useComponent<{ zones: ClockZone[] }>({
+    name: "show_clock",
+    description:
+      "Show a live clock in the chat for up to 6 time zones (IANA names like \"Asia/Kolkata\", \"America/New_York\"). Omit `zones` for the user's local time. Use for \"what time is it in…\" or comparing time zones.",
+    parameters: {
+      type: "object",
+      properties: {
+        zones: {
+          type: "array",
+          maxItems: 6,
+          items: {
+            type: "object",
+            properties: {
+              timeZone: { type: "string", description: "IANA time zone, e.g. \"Europe/London\"." },
+              label: { type: "string", description: "Display name, e.g. \"Office (London)\"." },
+            },
+            required: ["timeZone"],
+          },
+        },
+      },
+    },
+    render: (args) => <WorldClock zones={args.zones} />,
   });
 
   useComponent<{ seconds: number; label?: string }>({

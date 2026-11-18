@@ -44,7 +44,7 @@ Registered in `components/persona/chat-sdk/frontend-tools.tsx`. Arguments from t
 
 **Later:** `show_flashcards`, `play_focus_sound`, `show_study_plan`, `request_notification`.
 
-**Removed from plan:** `mood_check_in`, `show_mood_chart`, mood trends. Also drop the starter's `get_weather` and `show_clock`.
+**Removed from plan:** `mood_check_in`, `show_mood_chart`, mood trends. Keep the starter's `get_weather` and `show_clock`.
 
 Helpline numbers: double check them before launch, they can change.
 
