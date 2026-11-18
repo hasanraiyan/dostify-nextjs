@@ -4,7 +4,6 @@ import * as React from "react";
 import {
   ArrowUpIcon,
   SquareIcon,
-  PhoneXIcon,
   PaperclipIcon,
   XIcon,
   UploadSimpleIcon,
@@ -58,7 +57,7 @@ function VoiceModeIcon(props: React.SVGProps<SVGSVGElement>) {
  * unmounted. Which action the row shows is computed by the caller:
  *
  *   streaming   → stop generating
- *   voice live  → stop the call, or send the typed text into the call
+ *   voice live  → send the typed text into the call (ending it is not done here)
  *   default     → send message (dimmed until there is text to send)
  *
  * The idle send slot doubles as the voice-mode toggle when `onStartVoice` is
@@ -84,7 +83,6 @@ function ChatComposer({
   onSend,
   onStop,
   onStartVoice,
-  onStopVoice,
   onSendToVoice,
   onSendImageToVoice,
   isStreaming = false,
@@ -103,6 +101,7 @@ function ChatComposer({
   onStop?: () => void;
   /** Shown in the send slot instead of a dimmed arrow whenever the field is empty and idle. */
   onStartVoice?: () => void;
+  /** @deprecated The composer no longer has an end-call button; kept so callers still type-check. */
   onStopVoice?: () => void;
   onSendToVoice?: (text: string) => void;
   /** During a live call, picked/pasted/dropped images go straight into the call (no upload step). */
@@ -337,28 +336,18 @@ function ChatComposer({
                 <SquareIcon weight="fill" />
               </InputGroupButton>
             ) : isVoiceActive ? (
-              <div className="flex items-center gap-1.5">
-                {trimmed ? (
-                  <InputGroupButton
-                    type="submit"
-                    variant="default"
-                    size="icon-sm"
-                    aria-label="Send to voice"
-                    className="rounded-full"
-                  >
-                    <ArrowUpIcon />
-                  </InputGroupButton>
-                ) : null}
+              // No end-call button here: the call is ended from the voice controls.
+              trimmed ? (
                 <InputGroupButton
-                  type="button"
-                  variant="destructive"
+                  type="submit"
+                  variant="default"
                   size="icon-sm"
-                  aria-label="Stop voice"
-                  onClick={onStopVoice}
+                  aria-label="Send to voice"
+                  className="rounded-full"
                 >
-                  <PhoneXIcon />
+                  <ArrowUpIcon />
                 </InputGroupButton>
-              </div>
+              ) : null
             ) : !trimmed && !hasReadyAttachments && onStartVoice ? (
               <InputGroupButton
                 type="button"
