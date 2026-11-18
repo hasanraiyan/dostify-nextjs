@@ -2,7 +2,15 @@ import { z } from 'zod'
 import type { createMcpHandler } from 'mcp-handler'
 import { prisma } from '@/lib/prisma'
 import { syncClerkUser } from '@/lib/sync-user'
-import { countEntries, createEntry, listEntries } from '@/lib/dostify/journal'
+import {
+  countEntries,
+  createEntry,
+  deleteEntry,
+  getEntry,
+  listEntries,
+  patchEntry,
+} from '@/lib/dostify/journal'
+import { joinText, splitText } from '@/lib/dostify/entry-text'
 
 type McpServer = Parameters<Parameters<typeof createMcpHandler>[0]>[0]
 
@@ -39,31 +47,115 @@ function tool<A>(fn: (args: A, userId: string) => Promise<unknown>) {
   }
 }
 
+const isoDate = z.iso.datetime({ offset: true })
+
+interface JournalArgs {
+  action: 'list' | 'search' | 'get' | 'create' | 'update' | 'delete'
+  id?: string
+  title?: string
+  body?: string
+  mood?: number | null
+  pinned?: boolean
+  query?: string
+  limit?: number
+  since?: string
+  until?: string
+}
+
+const needId = (a: JournalArgs) => {
+  if (!a.id) throw new Error(`${a.action} needs an \`id\`. Use list or search to find it.`)
+  return a.id
+}
+
+/** What the agent sees for an entry: title and body split out. */
+function present(e: { id: string; text: string; mood: number | null; pinned: boolean; createdAt: Date }) {
+  const { title, body } = splitText(e.text)
+  return { id: e.id, title, body, mood: e.mood, pinned: e.pinned, createdAt: e.createdAt }
+}
+
 export function registerDostifyTools(server: McpServer) {
   server.registerTool(
-    'add_journal_entry',
+    'manage_journal',
     {
-      description:
-        'Save a mood journal entry the user wants to write down. mood is optional, 1 (very low) to 5 (great).',
+      description: [
+        "Read and change the user's journal with one tool. Pick an `action`:",
+        '- list: recent entries (newest first). Optional limit, pinnedOnly, since, until.',
+        '- search: entries containing `query`. Optional limit, since, until.',
+        '- get: one entry by `id`.',
+        '- create: a new entry. Needs `body`; `title` is optional. Optional mood (1-5) and pinned.',
+        '- update: change an entry by `id`. Pass ONLY what should change (title, body, mood, pinned); the rest is kept. Use pinned to pin or unpin. `mood: null` clears the mood.',
+        '- delete: permanently remove an entry by `id`. Confirm with the user first.',
+        'An entry is a title plus a body. Find an `id` with list or search before get, update or delete. Dates (since, until) are ISO 8601 with an offset, e.g. 2026-11-18T00:00:00+05:30.',
+      ].join('\n'),
+      annotations: { destructiveHint: true },
       inputSchema: z.object({
-        text: z.string().min(1).max(5000),
-        mood: z.number().int().min(1).max(5).optional(),
+        action: z.enum(['list', 'search', 'get', 'create', 'update', 'delete']),
+        id: z.string().optional().describe('Entry id (get, update, delete).'),
+        title: z.string().max(200).optional().describe('First line of the entry (create, update).'),
+        body: z.string().max(5000).optional().describe('The text under the title (create, update).'),
+        mood: z.number().int().min(1).max(5).nullable().optional().describe('1 (very low) to 5 (great).'),
+        pinned: z.boolean().optional().describe('Pin or unpin (create, update; list filters to pinned).'),
+        query: z.string().max(200).optional().describe('Text to look for (search).'),
+        limit: z.number().int().min(1).max(50).optional().describe('How many entries (list, search). Default 10.'),
+        since: isoDate.optional().describe('Only entries created at or after this time (list, search).'),
+        until: isoDate.optional().describe('Only entries created before this time (list, search).'),
       }),
     },
-    tool(async (a: { text: string; mood?: number }, userId) => {
-      return createEntry(userId, a)
-    }),
-  )
-
-  server.registerTool(
-    'list_journal_entries',
-    {
-      description: "Read the user's past journal entries, newest first.",
-      annotations: { readOnlyHint: true },
-      inputSchema: z.object({ limit: z.number().int().min(1).max(50).default(10) }),
-    },
-    tool(async (a: { limit: number }, userId) => {
-      return listEntries(userId, { limit: a.limit })
+    tool(async (a: JournalArgs, userId) => {
+      switch (a.action) {
+        case 'list':
+        case 'search': {
+          if (a.action === 'search' && !a.query?.trim()) throw new Error('search needs a `query`.')
+          const entries = await listEntries(userId, {
+            limit: a.limit ?? 10,
+            query: a.action === 'search' ? a.query : undefined,
+            pinnedOnly: a.action === 'list' ? a.pinned : undefined,
+            since: a.since ? new Date(a.since) : undefined,
+            until: a.until ? new Date(a.until) : undefined,
+          })
+          return { count: entries.length, entries: entries.map(present) }
+        }
+        case 'get': {
+          const entry = await getEntry(userId, needId(a))
+          if (!entry) throw new Error('Entry not found.')
+          return present(entry)
+        }
+        case 'create': {
+          const text = joinText((a.title ?? '').trim(), (a.body ?? '').trim()).trim()
+          if (!text) throw new Error('create needs a `body` (or a `title`).')
+          const entry = await createEntry(userId, {
+            text,
+            ...(a.mood != null && { mood: a.mood }),
+            ...(a.pinned !== undefined && { pinned: a.pinned }),
+          })
+          return present(entry)
+        }
+        case 'update': {
+          const id = needId(a)
+          if (a.title === undefined && a.body === undefined && a.mood === undefined && a.pinned === undefined) {
+            throw new Error('update needs at least one of title, body, mood or pinned.')
+          }
+          let text: string | undefined
+          if (a.title !== undefined || a.body !== undefined) {
+            const current = await getEntry(userId, id)
+            if (!current) throw new Error('Entry not found.')
+            const old = splitText(current.text)
+            text = joinText((a.title ?? old.title).trim(), (a.body ?? old.body).trim()).trim()
+            if (!text) throw new Error('An entry cannot be empty.')
+          }
+          const entry = await patchEntry(userId, id, {
+            ...(text !== undefined && { text }),
+            ...(a.mood !== undefined && { mood: a.mood }),
+            ...(a.pinned !== undefined && { pinned: a.pinned }),
+          })
+          if (!entry) throw new Error('Entry not found.')
+          return present(entry)
+        }
+        case 'delete': {
+          if (!(await deleteEntry(userId, needId(a)))) throw new Error('Entry not found.')
+          return { deleted: true }
+        }
+      }
     }),
   )
 

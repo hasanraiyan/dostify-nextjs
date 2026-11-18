@@ -1,7 +1,9 @@
 "use client";
 
+import Link from "next/link";
 import { useClerk, useUser } from "@clerk/nextjs";
-import { DotsThreeVerticalIcon, GearSixIcon, SignOutIcon } from "@phosphor-icons/react";
+import { DotsThreeVerticalIcon, SignOutIcon, UserIcon } from "@phosphor-icons/react";
+import { useRouter } from "next/navigation";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,20 +13,21 @@ import {
 
 /**
  * The account row at the bottom of the sidebar. Clicking the avatar or name
- * opens Clerk's profile panel; the three-dot menu has the same plus sign out.
+ * opens the profile page; the three-dot menu has the same plus sign out.
  */
-export function AccountSummary() {
+export function AccountSummary({ onNavigate }: { onNavigate?: () => void }) {
   const { user } = useUser();
-  const { openUserProfile, signOut } = useClerk();
+  const { signOut } = useClerk();
+  const router = useRouter();
   if (!user) return null;
 
   const name = user.fullName || user.username || "Signed in";
 
   return (
     <div className="flex items-center gap-1">
-      <button
-        type="button"
-        onClick={() => openUserProfile()}
+      <Link
+        href="/profile"
+        onClick={onNavigate}
         aria-label="Open profile"
         className="flex min-w-0 flex-1 items-center gap-2 rounded-xl p-1 text-left transition-colors hover:bg-muted"
       >
@@ -38,7 +41,7 @@ export function AccountSummary() {
             </span>
           )}
         </span>
-      </button>
+      </Link>
       <DropdownMenu>
         <DropdownMenuTrigger
           render={
@@ -52,9 +55,14 @@ export function AccountSummary() {
           }
         />
         <DropdownMenuContent align="end" side="top" className="min-w-44">
-          <DropdownMenuItem onClick={() => openUserProfile()}>
-            <GearSixIcon className="size-3.5" />
-            Manage account
+          <DropdownMenuItem
+            onClick={() => {
+              router.push("/profile");
+              onNavigate?.();
+            }}
+          >
+            <UserIcon className="size-3.5" />
+            Profile
           </DropdownMenuItem>
           <DropdownMenuItem
             variant="destructive"

@@ -51,7 +51,7 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
         {inJournal && <JournalPanel onNavigate={onNavigate} />}
       </div>
       <div className="border-t p-3">
-        <AccountSummary />
+        <AccountSummary onNavigate={onNavigate} />
       </div>
     </div>
   );

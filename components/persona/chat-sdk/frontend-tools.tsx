@@ -25,6 +25,7 @@ import {
 } from "./tool-widgets";
 import { HelplineCard } from "./dostify-widgets";
 import { LocationCard, fetchLocation } from "./location-tool";
+import { setThemePref } from "@/lib/dostify/theme";
 
 /**
  * Frontend tools: tools that run in the user's browser, which the agent can
@@ -44,6 +45,7 @@ const PAGES = {
   assistant: { path: "/assistant", label: "the assistant showcase" },
   journal: { path: "/journal", label: "the journal" },
   connectors: { path: "/connectors", label: "the connectors page" },
+  profile: { path: "/profile", label: "the profile and settings page" },
 } as const;
 type PageKey = keyof typeof PAGES;
 
@@ -201,7 +203,7 @@ export function PersonaFrontendTools() {
     },
     handler: ({ theme }) => {
       if (theme !== "light" && theme !== "dark") throw new Error(`Unknown theme "${theme}".`);
-      document.documentElement.classList.toggle("dark", theme === "dark");
+      setThemePref(theme);
       return { theme };
     },
   });
@@ -209,7 +211,7 @@ export function PersonaFrontendTools() {
   useFrontendTool<{ page: PageKey }>({
     name: "navigate_to",
     description:
-      'Open a page of this app for the user. "new_chat" starts a fresh conversation; "journal" opens the journal; "connectors" opens the page where the user connects their accounts; "assistant" opens the assistant feature showcase.',
+      'Open a page of this app for the user. "new_chat" starts a fresh conversation; "journal" opens the journal; "connectors" opens the page where the user connects their accounts; "profile" opens their profile and settings; "assistant" opens the assistant feature showcase.',
     parameters: {
       type: "object",
       properties: { page: { type: "string", enum: Object.keys(PAGES) } },

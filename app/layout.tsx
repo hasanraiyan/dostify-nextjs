@@ -7,6 +7,7 @@ import "./globals.css";
 import { cn } from "@/lib/utils";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ClerkProvider } from "@clerk/nextjs";
+import { THEME_INIT_SCRIPT } from "@/lib/dostify/theme";
 
 const spaceGroteskHeading = Space_Grotesk({
   subsets: ["latin"],
@@ -41,6 +42,8 @@ export default function RootLayout({
     <ClerkProvider>
       <html
         lang="en"
+        // The theme script adds `dark` before React hydrates.
+        suppressHydrationWarning
         className={cn(
           "h-full",
           "antialiased",
@@ -51,6 +54,9 @@ export default function RootLayout({
           spaceGroteskHeading.variable
         )}
       >
+        <head>
+          <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+        </head>
         <body className="min-h-full flex flex-col">
           <TooltipProvider>
             {children}
