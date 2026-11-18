@@ -127,6 +127,22 @@ export function usePersonaChatWidget(options: UsePersonaChatWidgetOptions = {}) 
     refetch: refreshThreads,
     isLoading: threadsLoading,
   } = useThreads();
+
+  // The SDK's thread fetch has no timeout, so a stalled request would leave the
+  // sidebar skeleton up forever. Flag it after a while so the UI can offer a retry.
+  const [threadsStalled, setThreadsStalled] = useState(false);
+  useEffect(() => {
+    if (!threadsLoading) {
+      setThreadsStalled(false);
+      return;
+    }
+    const timer = setTimeout(() => setThreadsStalled(true), 12_000);
+    return () => clearTimeout(timer);
+  }, [threadsLoading]);
+  const retryThreads = useCallback(() => {
+    setThreadsStalled(false);
+    void refreshThreads();
+  }, [refreshThreads]);
   const { files: uploadedFiles, uploadFile, deleteFile, isLoading: filesLoading } = useFiles();
 
   // Always called (hooks can't be conditional) — cheap until voice.start()
@@ -476,6 +492,8 @@ export function usePersonaChatWidget(options: UsePersonaChatWidgetOptions = {}) 
     // threads
     threads,
     threadsLoading,
+    threadsStalled,
+    retryThreads,
     createThread,
     deleteThread,
     renameThread,

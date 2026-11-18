@@ -34,6 +34,7 @@ import { ChatMessage } from "./chat-message";
 import { ChatComposer } from "./chat-composer";
 import { ChatEmptyState, type ChatStarterPrompt } from "./chat-empty-state";
 import { Spinner } from "@/components/ui/spinner";
+import { Skeleton } from "@/components/ui/skeleton";
 import { InterruptPanel } from "./interrupt-panel";
 import { McpConnectBanner, McpConnectionNotice } from "./mcp-connect-banner";
 import { McpConnectionsDialog } from "./mcp-connections-dialog";
@@ -308,6 +309,8 @@ export function PersonaChatView({
     activeThreadId,
     threads,
     threadsLoading,
+    threadsStalled,
+    retryThreads,
     handleSelectThread,
     handleNewChat,
     deleteThread,
@@ -608,7 +611,31 @@ export function PersonaChatView({
       <ScrollArea className="flex-1 min-h-0">
         <div className="flex flex-col gap-0.5 p-1.5">
           {threadsLoading && displayThreads.length === 0 && (
-            <div className="px-2 py-1.5 text-xs text-muted-foreground">Loading…</div>
+            <div
+              className="flex flex-col gap-1.5 px-1 py-1"
+              role="status"
+              aria-label="Loading chats"
+            >
+              {threadsStalled && (
+                <div className="flex items-center justify-between gap-2 px-1 text-xs text-muted-foreground">
+                  <span>Taking longer than usual…</span>
+                  <button
+                    type="button"
+                    onClick={retryThreads}
+                    className="font-medium text-foreground underline underline-offset-2"
+                  >
+                    Retry
+                  </button>
+                </div>
+              )}
+              {[72, 56, 84, 64, 78, 50].map((w, i) => (
+                <Skeleton
+                  key={i}
+                  className="skeleton-shimmer h-7 animate-none"
+                  style={{ width: `${w}%` }}
+                />
+              ))}
+            </div>
           )}
           {filteredThreads.length === 0 && !threadsLoading && (
             <div className="px-2 py-4 text-center text-xs text-muted-foreground">
