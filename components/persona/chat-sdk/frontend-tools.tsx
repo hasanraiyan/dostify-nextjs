@@ -27,6 +27,7 @@ import { HelplineCard } from "./dostify-widgets";
 import { LocationCard, fetchLocation } from "./location-tool";
 import { setThemePref } from "@/lib/dostify/theme";
 import { useAvatarTools } from "@personaai/avatar/persona";
+import { createAvatar, sakura, type Avatar } from "@personaai/avatar";
 import { useSlottedAvatar } from "../avatar";
 
 /**
@@ -363,9 +364,18 @@ export function PersonaFrontendTools() {
     render: (args) => <CountdownTimer seconds={args.seconds} label={args.label} />,
   });
 
-  // Let the agent emote and gesture: set_avatar_emotion / trigger_avatar_reaction, derived from
-  // what the avatar on screen can actually do (no hand-typed list to drift).
-  useAvatarTools(useSlottedAvatar());
+  // Always register avatar tools (set_avatar_emotion & trigger_avatar_reaction) so they are
+  // included in the voice session ticket even before the live call UI is mounted.
+  const slottedAvatar = useSlottedAvatar();
+  const fallbackAvatarRef = React.useRef<Avatar | null>(null);
+  if (!fallbackAvatarRef.current && typeof window !== "undefined") {
+    try {
+      fallbackAvatarRef.current = createAvatar({ pack: sakura });
+    } catch {}
+  }
+
+  const effectiveAvatar = slottedAvatar ?? fallbackAvatarRef.current;
+  useAvatarTools(effectiveAvatar);
 
   return null;
 }
