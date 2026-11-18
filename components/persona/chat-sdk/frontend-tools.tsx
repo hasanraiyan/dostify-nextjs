@@ -23,7 +23,7 @@ import {
   fetchWeather,
   type ClockZone,
 } from "./tool-widgets";
-import { BreathingExercise, HelplineCard } from "./dostify-widgets";
+import { HelplineCard } from "./dostify-widgets";
 import { LocationCard, fetchLocation } from "./location-tool";
 
 /**
@@ -302,14 +302,6 @@ export function PersonaFrontendTools() {
       "CRISIS: show the user a card with mental-health helplines (Tele-MANAS, KIRAN, iCall, 112) with tap-to-call buttons. Call this immediately, with no arguments, whenever the user mentions suicide, self-harm, abuse or being in immediate danger, in any language. Then keep talking to them warmly.",
     parameters: { type: "object", properties: {} },
     render: () => <HelplineCard />,
-  });
-
-  useComponent<Record<string, never>>({
-    name: "breathing_exercise",
-    description:
-      "Show a guided 4-7-8 breathing exercise (4 rounds) in the chat. Offer it when the user is stressed, anxious or overwhelmed and wants to calm down.",
-    parameters: { type: "object", properties: {} },
-    render: () => <BreathingExercise />,
   });
 
   useFrontendTool<{ city?: string }>({

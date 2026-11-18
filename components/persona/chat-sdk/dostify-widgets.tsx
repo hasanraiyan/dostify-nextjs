@@ -1,8 +1,8 @@
 "use client";
 
 import * as React from "react";
-import { HeartIcon, PhoneIcon, PlayIcon, StopIcon, WindIcon } from "@phosphor-icons/react";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { HeartIcon, PhoneIcon } from "@phosphor-icons/react";
+import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 /**
@@ -72,103 +72,6 @@ export function HelplineCard() {
         <p className="pt-1 text-xs text-muted-foreground">
           Please reach out to someone you trust, like family or a friend, who can be with you.
         </p>
-      </CardContent>
-    </Card>
-  );
-}
-
-// ── 4-7-8 breathing exercise ────────────────────────────────────────────────
-const PHASES = [
-  { label: "Breathe in", seconds: 4, scale: 1 },
-  { label: "Hold", seconds: 7, scale: 1 },
-  { label: "Breathe out", seconds: 8, scale: 0.55 },
-] as const;
-const CYCLES = 4;
-
-export function BreathingExercise() {
-  const [running, setRunning] = React.useState(false);
-  const [done, setDone] = React.useState(false);
-  const [cycle, setCycle] = React.useState(1);
-  const [phase, setPhase] = React.useState(0);
-  const [left, setLeft] = React.useState<number>(PHASES[0].seconds);
-
-  React.useEffect(() => {
-    if (!running) return;
-    const id = setInterval(() => {
-      setLeft((l) => {
-        if (l > 1) return l - 1;
-        // Phase finished: advance to the next phase, or the next cycle.
-        if (phase < PHASES.length - 1) {
-          setPhase(phase + 1);
-          return PHASES[phase + 1].seconds;
-        }
-        if (cycle < CYCLES) {
-          setCycle(cycle + 1);
-          setPhase(0);
-          return PHASES[0].seconds;
-        }
-        setRunning(false);
-        setDone(true);
-        return 0;
-      });
-    }, 1000);
-    return () => clearInterval(id);
-  }, [running, phase, cycle]);
-
-  const start = () => {
-    setDone(false);
-    setCycle(1);
-    setPhase(0);
-    setLeft(PHASES[0].seconds);
-    setRunning(true);
-  };
-
-  const current = PHASES[phase];
-  const active = running && !done;
-
-  return (
-    <Card size="sm" className="w-full max-w-xs">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-1.5">
-          <WindIcon className="size-4" />
-          Breathing 4-7-8
-        </CardTitle>
-        <CardDescription>
-          {done
-            ? "Done. How do you feel now?"
-            : active
-              ? `Round ${cycle} of ${CYCLES}`
-              : "In for 4, hold for 7, out for 8. Four rounds."}
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="flex flex-col items-center gap-3">
-        <div className="relative flex h-32 w-32 items-center justify-center" aria-live="polite">
-          <div
-            className="flex size-full items-center justify-center rounded-full bg-primary/15 ring-2 ring-primary/40 motion-safe:transition-transform motion-safe:ease-in-out"
-            style={{
-              transform: `scale(${active ? current.scale : 0.55})`,
-              transitionDuration: active ? `${phase === 1 ? 0 : current.seconds}s` : "0.3s",
-            }}
-          />
-          <span className="absolute text-center text-sm font-medium">
-            {active ? (
-              <>
-                {current.label}
-                <br />
-                <span className="font-mono text-2xl tabular-nums">{left}</span>
-              </>
-            ) : null}
-          </span>
-        </div>
-        {active ? (
-          <Button size="sm" variant="outline" onClick={() => setRunning(false)}>
-            <StopIcon /> Stop
-          </Button>
-        ) : (
-          <Button size="sm" onClick={start}>
-            <PlayIcon /> {done ? "Again" : "Start"}
-          </Button>
-        )}
       </CardContent>
     </Card>
   );
