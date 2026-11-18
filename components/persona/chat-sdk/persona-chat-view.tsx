@@ -6,7 +6,6 @@ import {
   ListIcon,
   MicrophoneIcon,
   MicrophoneSlashIcon,
-  PhoneXIcon,
   SidebarSimpleIcon,
   TerminalIcon,
 } from "@phosphor-icons/react";
@@ -790,7 +789,7 @@ export function PersonaChatView({
                   {/* Circular Avatar Container with perspective scaling to prevent cut-off shoulders */}
                   <div
                     className={cn(
-                      "relative flex size-44 sm:size-52 items-center justify-center overflow-hidden rounded-full bg-card shadow-2xl ring-4 transition-all duration-300",
+                      "relative flex size-44 sm:size-52 items-center justify-center overflow-hidden rounded-full bg-card ring-2 transition-all duration-300",
                       voice.isMuted
                         ? "ring-destructive/60"
                         : (VOICE_STATE_RING[voice.state] ?? "ring-foreground/20"),
@@ -812,70 +811,32 @@ export function PersonaChatView({
                     </div>
                   </div>
 
-                  {/* Modern Glassmorphism In-Call Control Bar */}
-                  <div className="mt-4 flex items-center gap-2.5 rounded-full border border-border/80 bg-background/95 px-4 py-2 shadow-xl backdrop-blur-md">
-                    {/* Live indicator & timer */}
-                    <div className="flex items-center gap-2 pr-1">
-                      <span className="relative flex size-2">
-                        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
-                        <span className="relative inline-flex size-2 rounded-full bg-emerald-500"></span>
-                      </span>
-                      <span className="text-xs font-mono font-medium text-foreground/80 tracking-wider">
-                        {callDuration}
-                      </span>
-                      {/* Audio visualizer wave bars */}
-                      <div className="flex items-center gap-0.5 ml-1">
-                        <span
-                          className={cn(
-                            "w-0.5 rounded-full bg-emerald-500 transition-all duration-150",
-                            voice.state === "speaking" ? "h-3.5 animate-pulse" : voice.state === "listening" ? "h-2" : "h-1",
-                          )}
-                        />
-                        <span
-                          className={cn(
-                            "w-0.5 rounded-full bg-emerald-500 transition-all duration-150",
-                            voice.state === "speaking" ? "h-4.5 animate-pulse delay-75" : voice.state === "listening" ? "h-2.5" : "h-1.5",
-                          )}
-                        />
-                        <span
-                          className={cn(
-                            "w-0.5 rounded-full bg-emerald-500 transition-all duration-150",
-                            voice.state === "speaking" ? "h-3 animate-pulse delay-150" : voice.state === "listening" ? "h-2" : "h-1",
-                          )}
-                        />
-                      </div>
-                    </div>
-
-                    <div className="h-4 w-px bg-border/80" />
-
-                    {/* Mute / Unmute Button */}
+                  {/* In-call controls: one flat pill with the time, mute and end. */}
+                  <div className="mt-4 flex items-center gap-1 rounded-full bg-muted p-1.5">
+                    <span className="px-3 text-sm tabular-nums text-muted-foreground">{callDuration}</span>
                     <button
                       type="button"
                       onClick={() => voice.mute(!voice.isMuted)}
-                      title={voice.isMuted ? "Unmute microphone" : "Mute microphone"}
+                      aria-label={voice.isMuted ? "Unmute microphone" : "Mute microphone"}
                       className={cn(
-                        "flex size-8 items-center justify-center rounded-full border transition-all duration-150 active:scale-95",
+                        "flex size-9 items-center justify-center rounded-full transition-colors active:scale-95",
                         voice.isMuted
-                          ? "bg-destructive/15 text-destructive border-destructive/30 hover:bg-destructive/25"
-                          : "bg-muted text-foreground/80 border-border hover:bg-muted/80 hover:text-foreground",
+                          ? "bg-destructive/10 text-destructive"
+                          : "text-foreground hover:bg-background",
                       )}
                     >
                       {voice.isMuted ? (
-                        <MicrophoneSlashIcon className="size-4" />
+                        <MicrophoneSlashIcon className="size-5" />
                       ) : (
-                        <MicrophoneIcon className="size-4" />
+                        <MicrophoneIcon className="size-5" />
                       )}
                     </button>
-
-                    {/* Styled End Call Pill Button */}
                     <button
                       type="button"
                       onClick={handleEndCallWithGoodbye}
-                      title="End voice call"
-                      className="flex items-center gap-1.5 rounded-full bg-destructive px-3.5 py-1.5 text-xs font-semibold text-white shadow-md shadow-destructive/25 transition-all hover:bg-destructive/90 hover:shadow-lg active:scale-95"
+                      className="h-9 rounded-full bg-destructive px-4 text-sm font-medium text-white transition-colors hover:bg-destructive/90 active:scale-95"
                     >
-                      <PhoneXIcon weight="fill" className="size-3.5" />
-                      <span>End Call</span>
+                      End call
                     </button>
                   </div>
                 </div>
