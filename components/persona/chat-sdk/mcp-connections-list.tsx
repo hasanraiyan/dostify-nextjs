@@ -39,6 +39,9 @@ function formatExpiry(expiresAt: string | null | undefined) {
   return `Expires ${date.toLocaleDateString(undefined, { month: "short", day: "numeric" })}`;
 }
 
+/** 1 column on phones, 2 from `sm`, 3 from `xl`, 4 from `2xl`. */
+const GRID = "grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4";
+
 export interface McpConnectionsListProps {
   connections: PersonaMcpConnection[];
   onConnect: (connection: PersonaMcpConnection) => void;
@@ -49,7 +52,11 @@ export interface McpConnectionsListProps {
   resolveDisplay?: (connection: PersonaMcpConnection) => ConnectorDisplay;
 }
 
-/** One row per user-mode MCP with Connect / Reconnect / Disconnect. Used by the dialog and the Connectors page. */
+/**
+ * The user-mode MCPs as a responsive card grid (1 column on phones, 2 from
+ * `sm`, 3 from `xl`), each with Connect / Reconnect / Disconnect. Buttons are
+ * full width with a touch-sized height on phones.
+ */
 export function McpConnectionsList({
   connections,
   onConnect,
@@ -76,102 +83,109 @@ export function McpConnectionsList({
     [onRevoke]
   );
 
+  if (isLoading && connections.length === 0) {
+    return (
+      <div className={GRID} aria-busy="true" role="status" aria-label="Loading connectors">
+        {[0, 1, 2].map((i) => (
+          <div key={i} className="flex flex-col gap-3 rounded-2xl border bg-card p-4">
+            <div className="flex items-center gap-3">
+              <span className="skeleton-shimmer size-11 shrink-0 rounded-xl bg-muted" />
+              <span className="skeleton-shimmer h-4 w-28 rounded-md bg-muted" />
+            </div>
+            <span className="skeleton-shimmer h-3 w-full rounded-md bg-muted" />
+            <span className="skeleton-shimmer h-3 w-2/3 rounded-md bg-muted" />
+            <span className="skeleton-shimmer mt-1 h-10 w-full rounded-full bg-muted sm:h-9" />
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  if (connections.length === 0) {
+    return (
+      <div className="flex flex-col items-center gap-2 rounded-2xl border border-dashed px-4 py-10 text-center">
+        <PlugsIcon className="size-7 text-muted-foreground" />
+        <p className="text-sm text-muted-foreground">No connectors are attached to this assistant.</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
-      {isLoading && connections.length === 0 ? (
-        <ul className="divide-y divide-border" aria-busy="true">
-          {[0, 1].map((i) => (
-            <li key={i} className="flex items-center gap-3 px-4 py-3">
-              <span className="size-8 shrink-0 animate-pulse border border-border bg-muted/60" />
-              <div className="flex flex-1 flex-col gap-1.5">
-                <span className="h-3 w-32 animate-pulse bg-muted" />
-                <span className="h-2.5 w-48 animate-pulse bg-muted/70" />
+    <>
+      <ul className={GRID}>
+        {connections.map((connection) => {
+          const status = statusOf(connection);
+          const isConnected = status === "connected";
+          const needsReconnect = status === "needs_auth" || status === "expired";
+          const revoking = revokingId === connection.mcpId;
+          const justConnected = justConnectedMcpId === connection.mcpId;
+          const expiry = isConnected ? formatExpiry(connection.expiresAt) : null;
+          const display: ConnectorDisplay = resolveDisplay?.(connection) ?? {
+            name: connection.name,
+            description: connection.description,
+          };
+          return (
+            <li
+              key={connection.mcpId}
+              className={cn(
+                "flex min-w-0 flex-col gap-3 rounded-2xl border bg-card p-4 transition-colors",
+                justConnected && "border-emerald-500/40 bg-emerald-500/5"
+              )}
+            >
+              <div className="flex items-center gap-3">
+                <ConnectorTile name={display.name} icon={display.icon} className="size-11 rounded-xl text-sm" />
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-[15px] leading-tight font-semibold">{display.name}</p>
+                  <p className="mt-1 flex items-center gap-1.5 text-xs text-muted-foreground">
+                    <span
+                      aria-hidden="true"
+                      className={cn("size-1.5 shrink-0 rounded-full", STATUS_DOTS[status])}
+                    />
+                    <span className="truncate">{STATUS_LABELS[status]}</span>
+                    {justConnected && (
+                      <span className="flex shrink-0 items-center gap-1 text-emerald-600 dark:text-emerald-400">
+                        <CheckCircleIcon weight="fill" className="size-3" />
+                        just now
+                      </span>
+                    )}
+                  </p>
+                </div>
               </div>
-            </li>
-          ))}
-        </ul>
-      ) : connections.length === 0 ? (
-        <div className="flex flex-col items-center gap-2 px-4 py-8 text-center">
-          <PlugsIcon className="size-6 text-muted-foreground" />
-          <p className="text-xs text-muted-foreground">
-            No connectors are attached to this assistant.
-          </p>
-        </div>
-      ) : (
-        <ul className="divide-y divide-border">
-          {connections.map((connection) => {
-            const status = statusOf(connection);
-            const isConnected = status === "connected";
-            const needsReconnect = status === "needs_auth" || status === "expired";
-            const revoking = revokingId === connection.mcpId;
-            const justConnected = justConnectedMcpId === connection.mcpId;
-            const expiry = isConnected ? formatExpiry(connection.expiresAt) : null;
-            const display: ConnectorDisplay = resolveDisplay?.(connection) ?? {
-              name: connection.name,
-              description: connection.description,
-            };
-            return (
-              <li
-                key={connection.mcpId}
-                className={cn(
-                  "flex items-start justify-between gap-3 px-4 py-3 transition-colors",
-                  justConnected && "bg-emerald-500/5"
+
+              {/* flex-1 keeps the button at the card's bottom edge across a row. */}
+              <div className="flex flex-1 flex-col gap-1">
+                {display.description && (
+                  <p className="line-clamp-3 text-sm text-muted-foreground">{display.description}</p>
                 )}
-              >
-                <div className="flex min-w-0 items-start gap-3">
-                  <ConnectorTile name={display.name} icon={display.icon} />
-                  <div className="flex min-w-0 flex-col gap-1">
-                    <div className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
-                      <span className="truncate text-sm font-medium">{display.name}</span>
-                      <span className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
-                        <span
-                          aria-hidden="true"
-                          className={cn("size-1.5 rounded-full", STATUS_DOTS[status])}
-                        />
-                        {STATUS_LABELS[status]}
-                        {justConnected && (
-                          <span className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400">
-                            <CheckCircleIcon weight="fill" className="size-3" />
-                            just now
-                          </span>
-                        )}
-                      </span>
-                    </div>
-                    {display.description && (
-                      <span className="line-clamp-2 text-xs text-muted-foreground">
-                        {display.description}
-                      </span>
-                    )}
-                    {connection.lastError && needsReconnect && (
-                      <span className="text-xs text-destructive">{connection.lastError}</span>
-                    )}
-                    {expiry && (
-                      <span className="text-[11px] text-muted-foreground">{expiry}</span>
-                    )}
-                  </div>
-                </div>
-                <div className="flex shrink-0 items-center self-center">
-                  {isConnected ? (
-                    <Button
-                      type="button"
-                      variant="outline"
-                      className="h-8 rounded-full px-4 text-muted-foreground hover:border-destructive/40 hover:bg-destructive/10 hover:text-destructive"
-                      disabled={revoking || revokingId !== null}
-                      onClick={() => void handleRevoke(connection.mcpId)}
-                    >
-                      {revoking && <Spinner className="size-3.5" />}
-                      Disconnect
-                    </Button>
-                  ) : (
-                    <ConnectButton connection={connection} onConnect={onConnect} />
-                  )}
-                </div>
-              </li>
-            );
-          })}
-        </ul>
-      )}
-      {error && <p className="px-4 pb-3 text-xs text-destructive">{error}</p>}
-    </div>
+                {connection.lastError && needsReconnect && (
+                  <p className="text-xs text-destructive">{connection.lastError}</p>
+                )}
+                {expiry && <p className="text-xs text-muted-foreground">{expiry}</p>}
+              </div>
+
+              {isConnected ? (
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="h-10 w-full rounded-full text-muted-foreground hover:border-destructive/40 hover:bg-destructive/10 hover:text-destructive sm:h-9"
+                  disabled={revoking || revokingId !== null}
+                  onClick={() => void handleRevoke(connection.mcpId)}
+                >
+                  {revoking && <Spinner className="size-3.5" />}
+                  Disconnect
+                </Button>
+              ) : (
+                <ConnectButton
+                  connection={connection}
+                  onConnect={onConnect}
+                  className="h-10 w-full sm:h-9"
+                />
+              )}
+            </li>
+          );
+        })}
+      </ul>
+      {error && <p className="pt-3 text-xs text-destructive">{error}</p>}
+    </>
   );
 }

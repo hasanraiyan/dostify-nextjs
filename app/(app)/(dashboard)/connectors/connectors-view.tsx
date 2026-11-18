@@ -91,97 +91,89 @@ export function ConnectorsView() {
   };
 
   return (
-    <div className="mx-auto flex w-full max-w-2xl flex-col gap-4">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <h1 className="font-heading text-2xl font-semibold">Connectors</h1>
-          <p className="text-sm text-muted-foreground">
-            Connect your accounts so Dostify can use them for you.
-            {connections.length > 0 &&
-              ` ${connected} of ${connections.length} connected.`}
-          </p>
-        </div>
-        {connections.length > 0 && (
-          <div className="relative w-full sm:max-w-60">
-            <MagnifyingGlassIcon className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
+    <div className="flex w-full flex-col gap-5">
+      <header className="flex flex-col gap-1">
+        <h1 className="font-heading text-2xl font-semibold sm:text-3xl">Connectors</h1>
+        <p className="text-sm text-muted-foreground">
+          Connect your accounts so Dostify can use them for you.
+          {connections.length > 0 && (
+            <span className="whitespace-nowrap"> {connected} of {connections.length} connected.</span>
+          )}
+        </p>
+      </header>
+
+      {connections.length > 0 && (
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+          <div className="relative w-full lg:max-w-sm">
+            <MagnifyingGlassIcon className="pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-muted-foreground" />
             <input
               type="search"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search connectors"
               aria-label="Search connectors"
-              className="h-9 w-full rounded-full border border-input bg-transparent pr-8 pl-9 text-sm outline-none transition-colors placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+              className="h-10 w-full rounded-full border border-input bg-transparent pr-9 pl-10 text-base outline-none transition-colors placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 sm:text-sm"
             />
             {query && (
               <button
                 type="button"
                 aria-label="Clear search"
                 onClick={() => setQuery("")}
-                className="absolute top-1/2 right-3 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                className="absolute top-1/2 right-2 flex size-7 -translate-y-1/2 items-center justify-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground"
               >
                 <XIcon className="size-4" />
               </button>
             )}
           </div>
-        )}
-      </div>
 
-      {connections.length > 0 && (
-        <div
-          role="radiogroup"
-          aria-label="Filter connectors"
-          className="flex flex-wrap gap-2"
-        >
-          {FILTERS.map(({ value, label }) => {
-            const active = filter === value;
-            return (
-              <button
-                key={value}
-                type="button"
-                role="radio"
-                aria-checked={active}
-                onClick={() => setFilter(value)}
-                className={cn(
-                  "rounded-full border px-3 py-1 text-xs font-medium transition-colors",
-                  active
-                    ? "border-primary bg-primary/10 text-foreground"
-                    : "text-muted-foreground hover:bg-muted hover:text-foreground",
-                )}
-              >
-                {label}{" "}
-                <span className="tabular-nums opacity-70">{counts[value]}</span>
-              </button>
-            );
-          })}
+          {/* One row that scrolls sideways on narrow screens instead of wrapping. */}
+          <div
+            role="radiogroup"
+            aria-label="Filter connectors"
+            className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 sm:mx-0 sm:px-0 sm:pb-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          >
+            {FILTERS.map(({ value, label }) => {
+              const active = filter === value;
+              return (
+                <button
+                  key={value}
+                  type="button"
+                  role="radio"
+                  aria-checked={active}
+                  onClick={() => setFilter(value)}
+                  className={cn(
+                    "h-9 shrink-0 rounded-full border px-4 text-sm font-medium whitespace-nowrap transition-colors",
+                    active
+                      ? "border-primary bg-primary/10 text-foreground"
+                      : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                  )}
+                >
+                  {label} <span className="tabular-nums opacity-70">{counts[value]}</span>
+                </button>
+              );
+            })}
+          </div>
         </div>
       )}
 
       {notice && (
-        <McpConnectionNotice
-          notice={notice}
-          onDismiss={dismissNotice}
-          className="rounded-xl"
-        />
+        <McpConnectionNotice notice={notice} onDismiss={dismissNotice} className="rounded-xl" />
       )}
 
-      <div className="overflow-hidden rounded-2xl border bg-card">
-        {connections.length > 0 && visible.length === 0 ? (
-          <p className="px-4 py-8 text-center text-sm text-muted-foreground">
-            No connectors match{q ? ` “${query.trim()}”` : " this filter"}.
-          </p>
-        ) : (
-          <McpConnectionsList
-            connections={visible}
-            isLoading={isLoading}
-            onConnect={connect}
-            onRevoke={disconnect}
-            resolveDisplay={resolveConnector}
-            justConnectedMcpId={
-              notice?.kind === "success" ? notice.mcpId : undefined
-            }
-          />
-        )}
-      </div>
+      {connections.length > 0 && visible.length === 0 ? (
+        <p className="rounded-2xl border border-dashed px-4 py-10 text-center text-sm text-muted-foreground">
+          No connectors match{q ? ` “${query.trim()}”` : " this filter"}.
+        </p>
+      ) : (
+        <McpConnectionsList
+          connections={visible}
+          isLoading={isLoading}
+          onConnect={connect}
+          onRevoke={disconnect}
+          resolveDisplay={resolveConnector}
+          justConnectedMcpId={notice?.kind === "success" ? notice.mcpId : undefined}
+        />
+      )}
     </div>
   );
 }
