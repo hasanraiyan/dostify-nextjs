@@ -34,9 +34,6 @@ export default function JournalPage() {
     <>
       <div>
         <h1 className="font-heading text-2xl font-semibold">Journal</h1>
-        <p className="text-sm text-muted-foreground">
-          Jo bhi dil mein hai, yahan likh de. Dostify chat mein bhi tera journal save karta hai.
-        </p>
       </div>
 
       <Card>
@@ -46,27 +43,12 @@ export default function JournalPage() {
               name="text"
               required
               maxLength={5000}
-              placeholder="Aaj kaisa raha?"
               className="min-h-24 rounded-xl"
               aria-label="Journal entry"
             />
-            <fieldset className="flex flex-wrap items-center gap-2">
-              <legend className="sr-only">Mood</legend>
-              {MOODS.map((m) => (
-                <label
-                  key={m.value}
-                  title={m.label}
-                  className="cursor-pointer rounded-full border border-border px-3 py-1 text-lg transition-colors has-[:checked]:border-primary has-[:checked]:bg-primary/15 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring"
-                >
-                  <input type="radio" name="mood" value={m.value} className="sr-only" />
-                  <span aria-hidden>{m.emoji}</span>
-                  <span className="sr-only">{m.label}</span>
-                </label>
-              ))}
-              <Button type="submit" className="ml-auto rounded-full">
-                Save
-              </Button>
-            </fieldset>
+            <Button type="submit" className="self-end rounded-full">
+              Save
+            </Button>
           </form>
         </CardContent>
       </Card>
