@@ -1,7 +1,6 @@
 import { clerkMiddleware } from "@clerk/nextjs/server";
 
-// Public paths: Clerk auth pages, SSO callback, MCP/OAuth endpoints,
-// and Twilio inbound channel webhooks (verified via X-Twilio-Signature).
+// Public paths: Clerk auth pages, SSO callback, and MCP/OAuth endpoints.
 const PUBLIC_PREFIXES = [
   "/sign-in",
   "/sign-up",
@@ -9,7 +8,6 @@ const PUBLIC_PREFIXES = [
   "/.well-known",
   "/api/webhooks",
   "/api/health",
-  "/api/persona/channels",
   "/mcp",
   "/sse",
 ];

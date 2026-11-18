@@ -36,7 +36,6 @@
       "files": [
         { "path": "components/persona/chat-sdk/agent-picker.tsx", "type": "registry:ui" },
         { "path": "components/persona/chat-sdk/agent-upsert-card.tsx", "type": "registry:ui" },
-        { "path": "components/persona/chat-sdk/channel-connect-dialog.tsx", "type": "registry:ui" },
         { "path": "components/persona/chat-sdk/chat-composer.tsx", "type": "registry:ui" },
         { "path": "components/persona/chat-sdk/chat-empty-state.tsx", "type": "registry:ui" },
         { "path": "components/persona/chat-sdk/chat-message.tsx", "type": "registry:ui" },
@@ -117,7 +116,7 @@
       "name": "persona-nextjs-adapter",
       "type": "registry:block",
       "title": "Persona Next.js Catch-All Route Handler",
-      "description": "Next.js App Router catch-all route handler for Persona AG-UI protocol and multi-channel webhooks.",
+      "description": "Next.js App Router catch-all route handler for Persona AG-UI protocol.",
       "dependencies": [
         "@personaai/adapters"
       ],

@@ -41,8 +41,6 @@ import { TodoChecklist } from "./todo-checklist";
 import { SubagentSheet } from "./subagent-sheet";
 import { MemoryWorkspaceDialog } from "./memory-workspace-dialog";
 import { SandboxTerminalDialog } from "./sandbox-terminal-dialog";
-import { ChannelConnectDialog } from "./channel-connect-dialog";
-import { PhoneCall } from "lucide-react";
 import { VoiceIndicator } from "./voice-indicator";
 import { AgentPicker, type PersonaAgentOption } from "./agent-picker";
 import { flattenSubagentActivity } from "./message-grouping";
@@ -376,7 +374,6 @@ export function PersonaChatView({
   const [openSubagentFor, setOpenSubagentFor] = React.useState<string | null>(null);
   const [filesOpen, setFilesOpen] = React.useState(false);
   const [terminalOpen, setTerminalOpen] = React.useState(false);
-  const [channelsOpen, setChannelsOpen] = React.useState(false);
   const [connectionsOpen, setConnectionsOpen] = React.useState(false);
   const isFilesSheetOpen = filesOpen || !!presentedFile;
 
@@ -862,17 +859,6 @@ export function PersonaChatView({
                 )}
               </Button>
             )}
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon-sm"
-              aria-label="Connect Phone, WhatsApp & SMS"
-              title="Connect Phone, WhatsApp & SMS"
-              onClick={() => setChannelsOpen(true)}
-              className="text-muted-foreground hover:text-foreground"
-            >
-              <PhoneCall className="size-4 text-emerald-500" />
-            </Button>
             {headerActions}
           </div>
         </div>
@@ -998,11 +984,6 @@ export function PersonaChatView({
           initialOpenPath={presentedFile?.path}
         />
       )}
-
-      <ChannelConnectDialog
-        open={channelsOpen}
-        onOpenChange={setChannelsOpen}
-      />
 
       {canShowTerminal && (
         <SandboxTerminalDialog

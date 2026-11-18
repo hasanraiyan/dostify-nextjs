@@ -16,6 +16,5 @@ export { toolCallStatus } from "./tool-status";
 export { MemoryWorkspaceDialog, type MemoryWorkspaceDialogProps } from "./memory-workspace-dialog";
 export { SandboxTerminalDialog, type SandboxTerminalDialogProps } from "./sandbox-terminal-dialog";
 export { McpConnectionsDialog, type McpConnectionsDialogProps } from "./mcp-connections-dialog";
-export { ChannelConnectDialog } from "./channel-connect-dialog";
 export { AgentPicker, type PersonaAgentOption } from "./agent-picker";
 export { PersonaFrontendTools } from "./frontend-tools";

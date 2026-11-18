@@ -76,12 +76,14 @@ Implemented as MCP tools in `app/[transport]/route.ts` backed by Prisma:
 - [ ] Add MCP tools in `app/[transport]/route.ts`.
 - [ ] Custom tool cards in chat for tasks / timer / journal.
 
-**Phase 3: Reminders and cleanup**
+**Phase 3: Reminders and cleanup** (cleanup DONE: Twilio/WhatsApp/SMS/call code, phone number field and extra agents removed)
 - [ ] In-app reminders.
 - [ ] Remove Twilio/WhatsApp/SMS/call code (`app/api/channels/outbound`, `app/api/user/phone`, Twilio block in persona route, channel-connect dialog, `twilio` dep, `phoneNumber` field).
 
 **Phase 4: Gamification**
 - [ ] XP/levels/streaks.
+
+**Phase 6 (last): Connectors** (Google Calendar, Notion, ... see `INTEGRATIONS.md`). Postponed until the website is complete.
 
 **Phase 5: Dashboard and polish**
 - [ ] Dashboard pages, mobile-friendly layout (PWA), deploy (Vercel + hosted Postgres).
@@ -97,6 +99,8 @@ Next.js 16, React 19, TypeScript, Tailwind v4, shadcn, Clerk, Prisma 7 + Postgre
 - No WhatsApp / SMS / phone calls. No credits / payments.
 - Keep sandbox terminal, file explorer, subagents.
 - Git branch: `dostify`.
+- Only 2 Persona agents: one chat, one voice.
+- Connectors are postponed to the end.
 
 ## 10. Open Questions
 1. Persona credentials (`PERSONA_BASE_URL`, `PERSONA_CREDENTIAL`) and new agent IDs: pending.
