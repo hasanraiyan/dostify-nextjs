@@ -13,7 +13,6 @@ import {
   PersonaFrontendTools,
 } from "@/components/persona/chat-sdk";
 import { AGENTS, DEFAULT_VOICE_AGENT_ID } from "@/app/agents";
-import { resolveConnector } from "@/lib/dostify/connector-meta";
 
 /**
  * The chat lives in the `(chat)` layout, not in a page, so navigating between
@@ -65,8 +64,6 @@ export function ChatShell({ children }: { children: React.ReactNode }) {
           onThreadChange={handleThreadChange}
           title="Dostify"
           showThreadList={false}
-          resolveConnectorDisplay={resolveConnector}
-          connectorsHref="/connectors"
           emptyTitle="What's on your mind?"
           emptyDescription="Talk, vent, or ask for help. I can also keep your journal."
           starterPrompts={[

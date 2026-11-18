@@ -1,8 +1,8 @@
 "use client";
 
 import * as React from "react";
-import { McpConnectionNotice } from "@/components/persona/chat-sdk/mcp-connect-banner";
-import { McpConnectionsList } from "@/components/persona/chat-sdk/mcp-connections-dialog";
+import { McpConnectionNotice } from "@/components/persona/chat-sdk/mcp-connection-notice";
+import { McpConnectionsList } from "@/components/persona/chat-sdk/mcp-connections-list";
 import { useMcpConnect } from "@/components/persona/chat-sdk/use-mcp-connect";
 import { AGENTS } from "@/app/agents";
 import { resolveConnector } from "@/lib/dostify/connector-meta";

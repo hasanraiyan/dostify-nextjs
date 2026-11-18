@@ -1,24 +1,9 @@
 "use client";
 
 import * as React from "react";
-import { CheckCircleIcon, KeyIcon, PlugsIcon } from "@phosphor-icons/react";
+import { CheckCircleIcon, PlugsIcon } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
 import { Spinner } from "@/components/ui/spinner";
-import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
 import type { PersonaMcpConnection } from "@personaai/react";
 import { ConnectButton, ConnectorTile, type ConnectorDisplay } from "./connector-ui";
@@ -188,101 +173,5 @@ export function McpConnectionsList({
       )}
       {error && <p className="px-4 pb-3 text-xs text-destructive">{error}</p>}
     </div>
-  );
-}
-
-export interface McpConnectionsDialogProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  /** Every user-mode MCP attached to the Agent (`useMcpConnections().connections`). */
-  connections: PersonaMcpConnection[];
-  /** Loads the consent flow and redirects to the provider. */
-  onConnect: (connection: PersonaMcpConnection) => void;
-  /** Revokes this end user's stored grant (DELETE …/oauth/user/connection). */
-  onRevoke: (mcpId: string) => Promise<void>;
-  /** The connector just confirmed by the OAuth callback — highlighted once. */
-  justConnectedMcpId?: string | null;
-  isLoading?: boolean;
-  /** Friendly name / icon for a connector; defaults to Persona's raw data. */
-  resolveDisplay?: (connection: PersonaMcpConnection) => ConnectorDisplay;
-}
-
-/**
- * The managing view the connect banner can't be: one row per user-mode MCP,
- * showing whether this end user's account is connected and letting them
- * either start the consent flow (same-tab redirect to `authorizeUrl`) or
- * revoke the stored grant. Revoking only drops this user's token — the
- * connector itself stays attached to the Agent.
- */
-export function McpConnectionsDialog({
-  open,
-  onOpenChange,
-  connections,
-  onConnect,
-  onRevoke,
-  justConnectedMcpId,
-  isLoading,
-  resolveDisplay,
-}: McpConnectionsDialogProps) {
-  const isMobile = useIsMobile();
-  const connectedCount = connections.filter((c) => statusOf(c) === "connected").length;
-  const body = (
-    <McpConnectionsList
-      connections={connections}
-      onConnect={onConnect}
-      onRevoke={onRevoke}
-      justConnectedMcpId={justConnectedMcpId}
-      isLoading={isLoading}
-      resolveDisplay={resolveDisplay}
-    />
-  );
-
-  const description = `${connectedCount} of ${connections.length} connected. Revoking removes the stored access token; the connector stays attached to the assistant.`;
-
-  if (isMobile) {
-    return (
-      <Sheet open={open} onOpenChange={onOpenChange}>
-        <SheetContent
-          side="bottom"
-          className="flex w-full flex-col gap-0 overflow-hidden rounded-t-lg p-0 outline-none data-[side=bottom]:h-[70vh] data-[side=bottom]:max-h-[70vh]"
-        >
-          <SheetHeader className="flex shrink-0 flex-row items-center justify-between border-b border-border bg-muted/20 px-4 py-3">
-            <div className="flex flex-col gap-0.5">
-              <SheetTitle className="flex items-center gap-2 text-sm font-semibold tracking-tight">
-                <span className="flex size-6 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-                  <KeyIcon className="size-3.5" />
-                </span>
-                Connected accounts
-              </SheetTitle>
-              <SheetDescription className="text-xs text-muted-foreground">
-                {description}
-              </SheetDescription>
-            </div>
-          </SheetHeader>
-          {body}
-        </SheetContent>
-      </Sheet>
-    );
-  }
-
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="flex max-h-[80vh] flex-col gap-0 overflow-hidden p-0 outline-none sm:max-w-lg">
-        <DialogHeader className="flex shrink-0 flex-row items-center justify-between border-b border-border bg-muted/20 px-5 py-3">
-          <div className="flex min-w-0 flex-col gap-0.5">
-            <DialogTitle className="flex items-center gap-2 text-sm font-semibold tracking-tight">
-              <span className="flex size-6 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-                <KeyIcon className="size-3.5" />
-              </span>
-              Connected accounts
-            </DialogTitle>
-            <DialogDescription className="text-xs text-muted-foreground">
-              {description}
-            </DialogDescription>
-          </div>
-        </DialogHeader>
-        {body}
-      </DialogContent>
-    </Dialog>
   );
 }

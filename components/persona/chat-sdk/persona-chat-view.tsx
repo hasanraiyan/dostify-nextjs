@@ -4,7 +4,6 @@ import * as React from "react";
 import {
   FolderOpenIcon,
   ListIcon,
-  PlugsConnectedIcon,
   SidebarSimpleIcon,
   TerminalIcon,
 } from "@phosphor-icons/react";
@@ -23,9 +22,6 @@ import { ChatEmptyState, type ChatStarterPrompt } from "./chat-empty-state";
 import { ThreadListBody } from "./thread-list";
 import { Spinner } from "@/components/ui/spinner";
 import { InterruptPanel } from "./interrupt-panel";
-import { McpConnectBanner, McpConnectionNotice } from "./mcp-connect-banner";
-import type { ConnectorDisplay } from "./connector-ui";
-import { McpConnectionsDialog } from "./mcp-connections-dialog";
 import { TodoChecklist } from "./todo-checklist";
 import { SubagentSheet } from "./subagent-sheet";
 import { MemoryWorkspaceDialog } from "./memory-workspace-dialog";
@@ -39,7 +35,6 @@ import {
 } from "./mcp-app-embed-context";
 import {
   useRenderToolCall,
-  type PersonaMcpConnection,
   type PersonaMessage,
   type PersonaStreamingEvent,
   type PersonaTodo,
@@ -182,10 +177,6 @@ export interface PersonaChatViewProps extends UsePersonaChatWidgetOptions {
   /** Initial collapsed state when `threadListCollapsed` isn't supplied. @default false */
   defaultThreadListCollapsed?: boolean;
   onThreadListCollapsedChange?: (collapsed: boolean) => void;
-  /** Friendly name / icon for connectors, used by the connect banner. */
-  resolveConnectorDisplay?: (connection: PersonaMcpConnection) => ConnectorDisplay;
-  /** Where the connect banner's "Manage" link goes (e.g. a connectors page). */
-  connectorsHref?: string;
   /** Pinned below the thread rows — e.g. the signed-in account's avatar. */
   threadListFooter?: React.ReactNode;
   /** @default true */
@@ -196,8 +187,6 @@ export interface PersonaChatViewProps extends UsePersonaChatWidgetOptions {
   showFiles?: boolean;
   /** Renders a "Terminal" button — only shown when the active Agent has `sandboxEnabled: true` — replaying its live `execute` tool calls. @default true */
   showTerminal?: boolean;
-  /** Renders a "Connected accounts" button (only when the Agent has user-mode MCP connectors) listing each one with Connect/Reconnect and Revoke. @default true */
-  showConnections?: boolean;
   /** Extra controls appended to the main header's right-side action group. */
   headerActions?: React.ReactNode;
   /**
@@ -260,13 +249,10 @@ export function PersonaChatView({
   defaultThreadListCollapsed = false,
   onThreadListCollapsedChange,
   threadListFooter,
-  resolveConnectorDisplay,
-  connectorsHref,
   showComposer = true,
   showVoice = true,
   showFiles = true,
   showTerminal = true,
-  showConnections = true,
   headerActions,
   theme,
   classNames = {},
@@ -318,14 +304,6 @@ export function PersonaChatView({
     error,
     interrupt,
     todos,
-    mcpConnections,
-    unconnectedMcps,
-    authBlockedMcpIds,
-    isLoadingMcpConnections,
-    connectMcp,
-    mcpNotice,
-    dismissMcpNotice,
-    disconnectMcp,
     handleSend,
     handleDecideHitl,
     handleSubmitClarification,
@@ -372,19 +350,7 @@ export function PersonaChatView({
   const [openSubagentFor, setOpenSubagentFor] = React.useState<string | null>(null);
   const [filesOpen, setFilesOpen] = React.useState(false);
   const [terminalOpen, setTerminalOpen] = React.useState(false);
-  const [connectionsOpen, setConnectionsOpen] = React.useState(false);
   const isFilesSheetOpen = filesOpen || !!presentedFile;
-
-  // The post-OAuth confirmation shouldn't require a click to clear: success
-  // fades on its own, failures linger long enough to be read.
-  React.useEffect(() => {
-    if (!mcpNotice) return;
-    const timeout = window.setTimeout(
-      dismissMcpNotice,
-      mcpNotice.kind === "success" ? 8000 : 15000
-    );
-    return () => window.clearTimeout(timeout);
-  }, [mcpNotice, dismissMcpNotice]);
   // Workspace files are Agent-scoped, not Thread-scoped (shared across every
   // conversation with that Agent) — prefer the active thread's own agentId
   // (authoritative for which agent this conversation is actually with) over
@@ -673,25 +639,6 @@ export function PersonaChatView({
                 <TerminalIcon />
               </Button>
             )}
-            {showConnections && mcpConnections.length > 0 && (
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon-sm"
-                aria-label={
-                  unconnectedMcps.length > 0
-                    ? `Connected accounts (${unconnectedMcps.length} need connecting)`
-                    : "Connected accounts"
-                }
-                onClick={() => setConnectionsOpen(true)}
-                className="relative"
-              >
-                <PlugsConnectedIcon />
-                {unconnectedMcps.length > 0 && (
-                  <span className="absolute top-1 right-1 size-1.5 rounded-full bg-primary ring-2 ring-background" />
-                )}
-              </Button>
-            )}
             {headerActions}
           </div>
         </div>
@@ -745,23 +692,6 @@ export function PersonaChatView({
           </div>
         )}
 
-        {mcpNotice && (
-          <div className="mx-auto w-full max-w-3xl shrink-0 px-4 pb-2">
-            <McpConnectionNotice notice={mcpNotice} onDismiss={dismissMcpNotice} />
-          </div>
-        )}
-
-        {unconnectedMcps.length > 0 && (
-          <div className="mx-auto w-full max-w-3xl shrink-0 px-4 pb-2">
-            <McpConnectBanner
-              connections={unconnectedMcps}
-              blockedMcpIds={authBlockedMcpIds}
-              onConnect={connectMcp}
-              resolveDisplay={resolveConnectorDisplay}
-              manageHref={connectorsHref}
-            />
-          </div>
-        )}
 
         {showComposer && (
           <div
@@ -828,20 +758,6 @@ export function PersonaChatView({
         />
       )}
 
-      {showConnections && mcpConnections.length > 0 && (
-        <McpConnectionsDialog
-          open={connectionsOpen}
-          onOpenChange={setConnectionsOpen}
-          connections={mcpConnections}
-          onConnect={connectMcp}
-          onRevoke={disconnectMcp}
-          justConnectedMcpId={
-            mcpNotice?.kind === "success" ? mcpNotice.mcpId : undefined
-          }
-          isLoading={isLoadingMcpConnections}
-          resolveDisplay={resolveConnectorDisplay}
-        />
-      )}
       </div>
     </McpAppSplitContext.Provider>
   );

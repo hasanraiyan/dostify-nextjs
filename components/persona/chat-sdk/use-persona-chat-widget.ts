@@ -7,18 +7,11 @@ import {
   useFiles,
   useVoice,
   useAttachments,
-  type PersonaMcpAuthRequiredServer,
   type PersonaStreamingEvent,
   type SendMessageOverride,
 } from "@personaai/react";
 import { useSharedThreads, useStalledFlag } from "./threads-context";
-import { useMcpConnect, type McpConnectionNotice } from "./use-mcp-connect";
-
-export type { McpConnectionNotice };
 import { groupReasoning } from "./message-grouping";
-
-/** Shared empty set — a stable identity keeps the no-blocked-tools case a no-op. */
-const EMPTY_BLOCKED_MCP_IDS: ReadonlySet<string> = new Set();
 
 export interface UsePersonaChatWidgetOptions {
   agentId?: string;
@@ -172,44 +165,8 @@ export function usePersonaChatWidget(options: UsePersonaChatWidgetOptions = {}) 
     void refreshThreads();
   }, [refreshThreads]);
 
-  // Per-user OAuth MCPs this end user hasn't connected — their tools are
-  // dropped from the Agent's toolset server-side, so the banner is the only
-  // place that gap is visible before a reply silently lacks capabilities.
-  const {
-    connections: mcpConnections,
-    unconnected: unconnectedMcps,
-    disconnect: disconnectMcp,
-    isDisconnecting: isDisconnectingMcp,
-    isLoading: isLoadingMcpConnections,
-    refetch: refetchMcpConnections,
-    connect: connectMcp,
-    notice: liveMcpNotice,
-    dismissNotice: dismissMcpNotice,
-  } = useMcpConnect({ agentId });
-
-  // Servers whose tools THIS run dropped (backend emits `mcp_auth_required`
-  // at the start of every run). Only sharpens the banner's copy — the list
-  // itself comes from live connection state, so it also covers connectors
-  // that haven't been set up yet at all. Keyed by agentId so switched agents
-  // never inherit the previous agent's blocks.
-  const [authBlocked, setAuthBlocked] = useState<{
-    agentId: string | undefined;
-    ids: ReadonlySet<string>;
-  }>({ agentId: undefined, ids: EMPTY_BLOCKED_MCP_IDS });
-  const authBlockedMcpIds =
-    authBlocked.agentId === agentId ? authBlocked.ids : EMPTY_BLOCKED_MCP_IDS;
-  const handleMcpAuthRequired = useCallback(
-    (servers: PersonaMcpAuthRequiredServer[]) => {
-      setAuthBlocked({ agentId, ids: new Set(servers.map((s) => s.mcpId)) });
-      // The run's build may have just learned the provider revoked the grant
-      // (needs_auth) — reload so the banner says "Reconnect", not "Connect".
-      void refetchMcpConnections();
-    },
-    [agentId, refetchMcpConnections]
-  );
-
   // TEMP DEBUG — trace the custom events the backend sends, especially
-  // `mcp_app` (widget metadata) and `mcp_auth_required` (dropped connectors).
+  // `mcp_app` (widget metadata).
   const handleStreamEvent = useCallback(
     (event: PersonaStreamingEvent) => {
       if (event.type === "CUSTOM") {
@@ -237,7 +194,6 @@ export function usePersonaChatWidget(options: UsePersonaChatWidgetOptions = {}) 
     onEvent: handleStreamEvent,
     onThreadCreated: handleThreadCreated,
     onTitle: handleTitle,
-    onMcpAuthRequired: handleMcpAuthRequired,
     // useChat merges live voice turns into `messages` automatically —
     // one bubble per utterance, deduped against history — while `voice`
     // is in an active (non-idle/ended/error) state.
@@ -360,18 +316,6 @@ export function usePersonaChatWidget(options: UsePersonaChatWidgetOptions = {}) 
     todos: rawTodos,
     interrupt: rawInterrupt,
     resumeInterrupt,
-    // MCP connectors — every one attached to the Agent, plus the subset this
-    // end user still needs to connect (or reconnect)
-    mcpConnections,
-    unconnectedMcps,
-    authBlockedMcpIds,
-    isLoadingMcpConnections,
-    refetchMcpConnections,
-    connectMcp,
-    mcpNotice: liveMcpNotice,
-    dismissMcpNotice,
-    disconnectMcp,
-    isDisconnectingMcp,
     // voice
     voice: wrappedVoice,
     isVoiceActive,
