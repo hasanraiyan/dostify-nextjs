@@ -5,14 +5,13 @@ import Link from "next/link";
 import { useClerk, useUser } from "@clerk/nextjs";
 import {
   CaretRightIcon,
-  CheckCircleIcon,
   GearSixIcon,
   MonitorIcon,
   MoonIcon,
   NotebookIcon,
   PlugsConnectedIcon,
+  PlusIcon,
   SignOutIcon,
-  SparkleIcon,
   SunIcon,
   type Icon,
 } from "@phosphor-icons/react";
@@ -57,14 +56,14 @@ export function ProfileView({
   const handleSelectAvatar = (selectedId: AvatarId) => {
     if (selectedId === avatarId) return;
     setAvatar(selectedId);
-    setSavedStatus("Saving...");
+    setSavedStatus("Saving…");
     startTransition(async () => {
       try {
         await saveUserAvatarChoice(selectedId);
-        setSavedStatus("Saved to database");
+        setSavedStatus("Saved");
         setTimeout(() => setSavedStatus(null), 2500);
       } catch {
-        setSavedStatus("Failed to save");
+        setSavedStatus("Couldn't save. Try again.");
       }
     });
   };
@@ -125,96 +124,62 @@ export function ProfileView({
         </CardContent>
       </Card>
 
-      {/* AI Companion Avatar Selection */}
+      {/* Companion: pick the face Dostify wears in voice calls. */}
       <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <div>
-            <CardTitle className="flex items-center gap-2">
-              <SparkleIcon className="size-5 text-primary" weight="fill" />
-              AI Companion Avatar
-            </CardTitle>
-            <CardDescription>
-              Choose your personal AI companion persona across all voice calls and chat.
-            </CardDescription>
-          </div>
-          {savedStatus && (
-            <span
-              className={cn(
-                "rounded-full px-2.5 py-1 text-xs font-medium transition-opacity",
-                savedStatus.includes("Saved")
-                  ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
-                  : savedStatus.includes("Failed")
-                    ? "bg-destructive/10 text-destructive"
-                    : "bg-muted text-muted-foreground animate-pulse",
-              )}
-            >
-              {savedStatus}
-            </span>
-          )}
+        <CardHeader>
+          <CardTitle>Companion</CardTitle>
+          <CardDescription>
+            {savedStatus ?? "The face you see in voice calls."}
+          </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4 pt-2">
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+        <CardContent>
+          <div className="grid grid-cols-3 gap-3">
             {AVATAR_OPTIONS.map((opt) => {
-              const isSelected = avatarId === opt.id;
+              const selected = avatarId === opt.id;
               return (
                 <button
                   key={opt.id}
                   type="button"
                   onClick={() => handleSelectAvatar(opt.id)}
-                  aria-pressed={isSelected}
+                  aria-pressed={selected}
                   disabled={isPending}
                   className={cn(
-                    "group relative flex flex-col items-center rounded-2xl border p-4 text-center transition-all duration-200 active:scale-[0.98]",
-                    isSelected
-                      ? "border-primary bg-primary/5 shadow-sm ring-2 ring-primary/40"
-                      : "border-border/80 bg-card hover:border-primary/50 hover:bg-muted/30",
+                    "flex flex-col items-center gap-3 rounded-2xl border p-4 transition-colors",
+                    selected ? "border-foreground" : "border-border hover:bg-muted",
                   )}
                 >
-                  {/* Selected check badge */}
-                  {isSelected && (
-                    <div className="absolute right-3 top-3 text-primary">
-                      <CheckCircleIcon weight="fill" className="size-5" />
-                    </div>
-                  )}
-
-                  {/* Avatar Circular Preview */}
-                  <div
-                    className={cn(
-                      "relative mb-3 flex size-24 items-center justify-center rounded-full overflow-hidden shadow-inner ring-2 transition-all duration-200",
-                      isSelected
-                        ? "ring-primary ring-offset-2 ring-offset-background"
-                        : "ring-border/70 group-hover:ring-primary/40",
-                    )}
-                  >
-                    <div
-                      className="size-full origin-center"
+                  <span className="relative block size-20 overflow-hidden rounded-full bg-card">
+                    <span
+                      className="block size-full origin-center"
                       style={{ transform: "translateY(10.5%) scale(1.35)" }}
                     >
                       <AnimeVoiceAvatar
                         pack={opt.pack}
-                        size={96}
+                        size={80}
                         state="idle"
                         emotion="happy"
                         mouseTracking={false}
                       />
-                    </div>
-                  </div>
-
-                  {/* Avatar details */}
-                  <div className="w-full">
-                    <div className="flex items-center justify-center gap-1.5">
-                      <span className="font-semibold text-foreground">{opt.name}</span>
-                    </div>
-                    <span className="mt-0.5 inline-block rounded-full bg-muted px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
-                      {opt.badge}
                     </span>
-                    <p className="mt-2 text-xs leading-relaxed text-muted-foreground line-clamp-2">
-                      {opt.description}
-                    </p>
-                  </div>
+                  </span>
+                  <span className="text-sm font-medium">{opt.name}</span>
                 </button>
               );
             })}
+
+            {/* Not available yet: shown, but not clickable. */}
+            <div
+              aria-disabled="true"
+              className="flex flex-col items-center gap-3 rounded-2xl border border-dashed p-4 text-muted-foreground"
+            >
+              <span className="flex size-20 items-center justify-center rounded-full bg-muted">
+                <PlusIcon className="size-6" />
+              </span>
+              <span className="flex flex-col items-center text-center">
+                <span className="text-sm font-medium text-foreground">Create your own</span>
+                <span className="text-xs">Coming soon</span>
+              </span>
+            </div>
           </div>
         </CardContent>
       </Card>
