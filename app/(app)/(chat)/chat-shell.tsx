@@ -3,12 +3,6 @@
 import * as React from "react";
 import { usePathname, useRouter } from "next/navigation";
 import {
-  ChatCircleIcon,
-  HeartIcon,
-  NotebookIcon,
-  WindIcon,
-} from "@phosphor-icons/react";
-import {
   PersonaChatView,
   PersonaFrontendTools,
 } from "@/components/persona/chat-sdk";
@@ -64,30 +58,6 @@ export function ChatShell({ children }: { children: React.ReactNode }) {
           onThreadChange={handleThreadChange}
           title="Dostify"
           showThreadList={false}
-          emptyTitle="What's on your mind?"
-          emptyDescription="Talk, vent, or ask for help. I can also keep your journal."
-          starterPrompts={[
-            {
-              label: "I need to vent",
-              icon: HeartIcon,
-              template: "I need to vent for a bit",
-            },
-            {
-              label: "Help me calm down",
-              icon: WindIcon,
-              template: "I'm stressed. Can you help me calm down?",
-            },
-            {
-              label: "Write in my journal",
-              icon: NotebookIcon,
-              template: "I want to write something in my journal",
-            },
-            {
-              label: "What can you do?",
-              icon: ChatCircleIcon,
-              template: "What can you do?",
-            },
-          ]}
         />
       </div>
       {children}

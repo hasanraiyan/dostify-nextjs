@@ -675,7 +675,7 @@ export function PersonaChatView({
               <Spinner className="size-5 text-muted-foreground" />
             </div>
           )
-        ) : messages.length === 0 ? (
+        ) : messages.length === 0 && !isVoiceActive && (emptyState || emptyTitle || emptyDescription || (starterPrompts && starterPrompts.length > 0)) ? (
           emptyState ?? (
             <EmptyStateComponent
               title={emptyTitle}

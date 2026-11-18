@@ -158,11 +158,6 @@ export function AssistantExperience() {
             icon: ChatCircleDotsIcon,
             template: "What can you do?",
           },
-          {
-            label: "Talk by voice",
-            icon: MicrophoneIcon,
-            template: "I'd like to talk by voice.",
-          },
         ]}
       />
       </AvatarSlotProvider>
