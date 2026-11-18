@@ -1,15 +1,18 @@
 "use client";
 
+import * as React from "react";
 import Link from "next/link";
 import { useClerk, useUser } from "@clerk/nextjs";
 import {
   CaretRightIcon,
+  CheckCircleIcon,
   GearSixIcon,
   MonitorIcon,
   MoonIcon,
   NotebookIcon,
   PlugsConnectedIcon,
   SignOutIcon,
+  SparkleIcon,
   SunIcon,
   type Icon,
 } from "@phosphor-icons/react";
@@ -19,6 +22,10 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useThemePref } from "@/components/dostify/use-theme";
 import type { ThemePref } from "@/lib/dostify/theme";
 import { cn } from "@/lib/utils";
+import { AVATAR_OPTIONS, type AvatarId } from "@/lib/dostify/avatar-config";
+import { useAvatarPref } from "@/components/dostify/use-avatar-pref";
+import { saveUserAvatarChoice } from "@/lib/dostify/avatar-actions";
+import { AnimeVoiceAvatar } from "@/components/persona/avatar";
 
 const THEMES: { value: ThemePref; label: string; icon: Icon }[] = [
   { value: "light", label: "Light", icon: SunIcon },
@@ -34,13 +41,33 @@ const SHORTCUTS = [
 export function ProfileView({
   memberSince,
   journalEntries,
+  initialAvatar = "sakura",
 }: {
   memberSince: string | null;
   journalEntries: number;
+  initialAvatar?: AvatarId;
 }) {
   const { user, isLoaded } = useUser();
   const { openUserProfile, signOut } = useClerk();
   const [theme, setTheme] = useThemePref();
+  const { avatarId, setAvatar } = useAvatarPref(initialAvatar);
+  const [isPending, startTransition] = React.useTransition();
+  const [savedStatus, setSavedStatus] = React.useState<string | null>(null);
+
+  const handleSelectAvatar = (selectedId: AvatarId) => {
+    if (selectedId === avatarId) return;
+    setAvatar(selectedId);
+    setSavedStatus("Saving...");
+    startTransition(async () => {
+      try {
+        await saveUserAvatarChoice(selectedId);
+        setSavedStatus("Saved to database");
+        setTimeout(() => setSavedStatus(null), 2500);
+      } catch {
+        setSavedStatus("Failed to save");
+      }
+    });
+  };
 
   if (!isLoaded) return <Skeleton className="skeleton-shimmer h-32 animate-none rounded-2xl" />;
   if (!user) return <p className="text-sm text-muted-foreground">Please sign in.</p>;
@@ -98,6 +125,100 @@ export function ProfileView({
         </CardContent>
       </Card>
 
+      {/* AI Companion Avatar Selection */}
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <div>
+            <CardTitle className="flex items-center gap-2">
+              <SparkleIcon className="size-5 text-primary" weight="fill" />
+              AI Companion Avatar
+            </CardTitle>
+            <CardDescription>
+              Choose your personal AI companion persona across all voice calls and chat.
+            </CardDescription>
+          </div>
+          {savedStatus && (
+            <span
+              className={cn(
+                "rounded-full px-2.5 py-1 text-xs font-medium transition-opacity",
+                savedStatus.includes("Saved")
+                  ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                  : savedStatus.includes("Failed")
+                    ? "bg-destructive/10 text-destructive"
+                    : "bg-muted text-muted-foreground animate-pulse",
+              )}
+            >
+              {savedStatus}
+            </span>
+          )}
+        </CardHeader>
+        <CardContent className="space-y-4 pt-2">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+            {AVATAR_OPTIONS.map((opt) => {
+              const isSelected = avatarId === opt.id;
+              return (
+                <button
+                  key={opt.id}
+                  type="button"
+                  onClick={() => handleSelectAvatar(opt.id)}
+                  aria-pressed={isSelected}
+                  disabled={isPending}
+                  className={cn(
+                    "group relative flex flex-col items-center rounded-2xl border p-4 text-center transition-all duration-200 active:scale-[0.98]",
+                    isSelected
+                      ? "border-primary bg-primary/5 shadow-sm ring-2 ring-primary/40"
+                      : "border-border/80 bg-card hover:border-primary/50 hover:bg-muted/30",
+                  )}
+                >
+                  {/* Selected check badge */}
+                  {isSelected && (
+                    <div className="absolute right-3 top-3 text-primary">
+                      <CheckCircleIcon weight="fill" className="size-5" />
+                    </div>
+                  )}
+
+                  {/* Avatar Circular Preview */}
+                  <div
+                    className={cn(
+                      "relative mb-3 flex size-24 items-center justify-center rounded-full overflow-hidden shadow-inner ring-2 transition-all duration-200",
+                      isSelected
+                        ? "ring-primary ring-offset-2 ring-offset-background"
+                        : "ring-border/70 group-hover:ring-primary/40",
+                    )}
+                  >
+                    <div
+                      className="size-full origin-center"
+                      style={{ transform: "translateY(10.5%) scale(1.35)" }}
+                    >
+                      <AnimeVoiceAvatar
+                        pack={opt.pack}
+                        size={96}
+                        state="idle"
+                        emotion="happy"
+                        mouseTracking={false}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Avatar details */}
+                  <div className="w-full">
+                    <div className="flex items-center justify-center gap-1.5">
+                      <span className="font-semibold text-foreground">{opt.name}</span>
+                    </div>
+                    <span className="mt-0.5 inline-block rounded-full bg-muted px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
+                      {opt.badge}
+                    </span>
+                    <p className="mt-2 text-xs leading-relaxed text-muted-foreground line-clamp-2">
+                      {opt.description}
+                    </p>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </CardContent>
+      </Card>
+
       <Card>
         <CardHeader>
           <CardTitle>Appearance</CardTitle>
@@ -149,3 +270,4 @@ export function ProfileView({
     </>
   );
 }
+

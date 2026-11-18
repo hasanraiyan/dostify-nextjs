@@ -32,6 +32,7 @@ import { VoiceIndicator } from "./voice-indicator";
 import { VoiceDock } from "./voice-dock";
 import type { Avatar } from "@personaai/avatar";
 import { playGoodbye } from "@personaai/avatar/persona";
+import { useAvatarPref } from "@/components/dostify/use-avatar-pref";
 import { AgentPicker, type PersonaAgentOption } from "./agent-picker";
 import { flattenSubagentActivity } from "./message-grouping";
 import {
@@ -369,6 +370,7 @@ export function PersonaChatView({
     enableVoice: showVoice,
   });
 
+  const { pack: avatarPack } = useAvatarPref();
   const callDuration = useCallTimer(isVoiceActive);
   const inViewAvatarRef = React.useRef<Avatar | null>(null);
 
@@ -802,6 +804,7 @@ export function PersonaChatView({
                       <VoiceIndicator
                         state={voice.state}
                         voice={voice}
+                        pack={avatarPack}
                         size={208}
                         variant="avatar"
                         onAvatarReady={(a) => {

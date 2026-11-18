@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useVoice, type UseVoiceResult } from "@personaai/react";
 import { VoiceDock } from "./voice-dock";
 import { DEFAULT_VOICE_AGENT_ID } from "@/app/agents";
+import { useAvatarPref } from "@/components/dostify/use-avatar-pref";
 
 export interface GlobalVoiceContextValue {
   voice: UseVoiceResult;
@@ -18,6 +19,7 @@ const GlobalVoiceContext = React.createContext<GlobalVoiceContextValue | null>(n
 export function GlobalVoiceProvider({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
+  const { pack } = useAvatarPref();
 
   const voiceAgentId =
     process.env.NEXT_PUBLIC_PERSONA_VOICE_AGENT_ID || DEFAULT_VOICE_AGENT_ID;
@@ -64,6 +66,7 @@ export function GlobalVoiceProvider({ children }: { children: React.ReactNode })
       {showFloatingDock && (
         <VoiceDock
           voice={voice}
+          pack={pack}
           onExpand={() => router.push("/chat")}
         />
       )}

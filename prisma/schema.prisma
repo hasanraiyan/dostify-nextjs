@@ -18,6 +18,7 @@ model User {
   email          String         @unique
   name           String?
   imageUrl       String?
+  avatarChoice   String         @default("sakura")
   createdAt      DateTime       @default(now())
   updatedAt      DateTime       @updatedAt
   journalEntries JournalEntry[]

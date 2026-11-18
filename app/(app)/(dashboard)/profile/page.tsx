@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getCurrentDbUser } from "@/lib/dostify/current-user";
 import { countEntries } from "@/lib/dostify/journal";
+import { isValidAvatarId, type AvatarId } from "@/lib/dostify/avatar-config";
 import { ProfileView } from "./profile-view";
 
 export const metadata: Metadata = { title: "Profile — Dostify" };
@@ -38,5 +39,17 @@ async function ProfileData() {
       })
     : null;
 
-  return <ProfileView memberSince={memberSince} journalEntries={journalEntries} />;
+  const initialAvatar: AvatarId =
+    user?.avatarChoice && isValidAvatarId(user.avatarChoice)
+      ? user.avatarChoice
+      : "sakura";
+
+  return (
+    <ProfileView
+      memberSince={memberSince}
+      journalEntries={journalEntries}
+      initialAvatar={initialAvatar}
+    />
+  );
 }
+
