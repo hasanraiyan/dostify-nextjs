@@ -835,9 +835,15 @@ export function PersonaChatView({
                         : (VOICE_STATE_RING[voice.state] ?? "ring-foreground/20"),
                     )}
                   >
+                    {/* The art is always 208px; --k shrinks it to match the circle
+                        (176px on phones, 208px from sm) so the crop and the
+                        shoulder offset stay identical to the voice FAB. */}
                     <div
-                      className="size-full origin-center"
-                      style={{ transform: "translateY(10.5%) scale(1.35)" }}
+                      className="size-[208px] shrink-0 origin-center [--k:0.846] sm:[--k:1]"
+                      style={{
+                        transform:
+                          "translateY(calc(10.5% * var(--k))) scale(calc(1.35 * var(--k)))",
+                      }}
                     >
                       <VoiceIndicator
                         state={voice.state}
