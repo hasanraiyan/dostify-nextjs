@@ -24,6 +24,7 @@ import {
   type ClockZone,
 } from "./tool-widgets";
 import { BreathingExercise, HelplineCard } from "./dostify-widgets";
+import { LocationCard, fetchLocation } from "./location-tool";
 
 /**
  * Frontend tools: tools that run in the user's browser, which the agent can
@@ -282,6 +283,17 @@ export function PersonaFrontendTools() {
       required: ["title", "kind", "data"],
     },
     render: (args) => <ToolChart {...args} />,
+  });
+
+  useFrontendTool<Record<string, never>>({
+    name: "get_location",
+    description:
+      "Get the user's current location (coordinates, accuracy and a place name) and show it to them on a map. The browser asks the user for permission first. Only call this when the user asks for something that needs where they are (nearby places, directions, local weather, \"where am I\"); never call it proactively. If it fails or they decline, ask them for their city instead. Don't repeat the exact coordinates back unless asked, a place name is enough.",
+    parameters: { type: "object", properties: {} },
+    handler: () => fetchLocation(),
+    render: ({ status, result, isError }) => (
+      <LocationCard status={status} result={result} isError={isError} />
+    ),
   });
 
   useComponent<Record<string, never>>({

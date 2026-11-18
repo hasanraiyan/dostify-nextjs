@@ -72,21 +72,60 @@ function WeatherIcon({ code, className }: { code: number; className?: string }) 
   return <Icon weight="duotone" className={className} />;
 }
 
+const NETWORK_TIMEOUT_MS = 10_000;
+/** Hard cap on the whole location lookup, including the permission prompt. */
+const LOCATION_TIMEOUT_MS = 20_000;
+
 async function getJson(url: string): Promise<unknown> {
-  const res = await fetch(url);
+  let res: Response;
+  try {
+    res = await fetch(url, { signal: AbortSignal.timeout(NETWORK_TIMEOUT_MS) });
+  } catch {
+    throw new Error("The weather service didn't respond in time. Try again in a moment.");
+  }
   if (!res.ok) throw new Error(`Weather service error (${res.status}).`);
   return res.json();
 }
 
-function browserPosition(): Promise<{ latitude: number; longitude: number }> {
+export interface BrowserPosition {
+  latitude: number;
+  longitude: number;
+  accuracyMeters: number;
+}
+
+/**
+ * The browser's location. `getCurrentPosition`'s own `timeout` only starts
+ * once the user has answered the permission prompt, so an ignored or hidden
+ * prompt would wait forever. The outer timer bounds the whole thing.
+ */
+export function browserPosition(): Promise<BrowserPosition> {
   return new Promise((resolve, reject) => {
     if (!("geolocation" in navigator)) {
       reject(new Error("This browser can't share its location — ask the user for a city."));
       return;
     }
+    const timer = setTimeout(
+      () =>
+        reject(
+          new Error(
+            "No location was shared (the permission prompt wasn't answered) — ask the user for a city instead.",
+          ),
+        ),
+      LOCATION_TIMEOUT_MS,
+    );
     navigator.geolocation.getCurrentPosition(
-      (pos) => resolve({ latitude: pos.coords.latitude, longitude: pos.coords.longitude }),
-      () => reject(new Error("The user didn't share their location — ask them for a city.")),
+      (pos) => {
+        clearTimeout(timer);
+        resolve({
+          latitude: pos.coords.latitude,
+          longitude: pos.coords.longitude,
+          accuracyMeters: Math.round(pos.coords.accuracy),
+        });
+      },
+      () => {
+        clearTimeout(timer);
+        reject(new Error("The user didn't share their location — ask them for a city."));
+      },
       { timeout: 10_000, maximumAge: 10 * 60_000 },
     );
   });
