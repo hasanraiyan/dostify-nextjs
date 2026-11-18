@@ -4,7 +4,6 @@ import { Geist, Geist_Mono, Inter, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 
 import { cn } from "@/lib/utils";
-import { NativeAuthBridge } from "@/components/dostify/native-auth";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ClerkProvider } from "@clerk/nextjs";
 import { THEME_INIT_SCRIPT } from "@/lib/dostify/theme";
@@ -125,7 +124,6 @@ export default function RootLayout({
           <TooltipProvider>
             {children}
           </TooltipProvider>
-          <NativeAuthBridge />
 
           {/* <anam-agent
             agent-id="92fa58a4-bd6c-41e3-9b56-8c0798d4be00"

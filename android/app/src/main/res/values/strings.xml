@@ -1,7 +1,0 @@
-<?xml version='1.0' encoding='utf-8'?>
-<resources>
-    <string name="app_name">Dostify</string>
-    <string name="title_activity_main">Dostify</string>
-    <string name="package_name">me.hasanraiyan.dostify</string>
-    <string name="custom_url_scheme">me.hasanraiyan.dostify</string>
-</resources>

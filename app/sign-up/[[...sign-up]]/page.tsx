@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { SignUp } from "@clerk/nextjs";
-import { NativeAuthGate } from "@/components/dostify/native-auth";
 import { AuthShell } from "@/components/dostify/auth/auth-shell";
 import { clerkAppearance } from "@/components/dostify/auth/clerk-appearance";
 
@@ -20,9 +19,7 @@ export default function SignUpPage() {
       panelBody="Keep a private journal, connect your apps, and get a hand with your day."
     >
       <Suspense>
-        <NativeAuthGate>
-          <SignUp appearance={clerkAppearance} signInUrl="/sign-in" fallbackRedirectUrl="/chat" />
-        </NativeAuthGate>
+        <SignUp appearance={clerkAppearance} signInUrl="/sign-in" fallbackRedirectUrl="/chat" />
       </Suspense>
     </AuthShell>
   );
