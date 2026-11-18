@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { CheckCircleIcon, KeyIcon, PlugsIcon } from "@phosphor-icons/react";
+import { ArrowsClockwiseIcon, CheckCircleIcon, KeyIcon, PlugsIcon } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -92,6 +92,17 @@ export function McpConnectionsList({
   resolveDisplay,
 }: McpConnectionsListProps) {
   const [revokingId, setRevokingId] = React.useState<string | null>(null);
+  // Connecting is a full-page redirect, so show progress until the browser leaves.
+  const [connectingId, setConnectingId] = React.useState<string | null>(null);
+  // Coming back with the Back button restores this page from the browser's
+  // cache, "Connecting…" included, so clear it then.
+  React.useEffect(() => {
+    const reset = (e: PageTransitionEvent) => {
+      if (e.persisted) setConnectingId(null);
+    };
+    window.addEventListener("pageshow", reset);
+    return () => window.removeEventListener("pageshow", reset);
+  }, []);
   const [error, setError] = React.useState<string | null>(null);
 
   const handleRevoke = React.useCallback(
@@ -183,28 +194,40 @@ export function McpConnectionsList({
                     )}
                   </div>
                 </div>
-                <div className="flex shrink-0 items-center gap-1">
+                <div className="flex shrink-0 items-center self-center">
                   {isConnected ? (
                     <Button
                       type="button"
-                      size="sm"
-                      variant="ghost"
-                      className="text-muted-foreground hover:text-destructive"
+                      variant="outline"
+                      className="h-8 rounded-full px-4 text-muted-foreground hover:border-destructive/40 hover:bg-destructive/10 hover:text-destructive"
                       disabled={revoking || revokingId !== null}
                       onClick={() => void handleRevoke(connection.mcpId)}
                     >
-                      {revoking && <Spinner className="size-3" />}
+                      {revoking && <Spinner className="size-3.5" />}
                       Disconnect
                     </Button>
                   ) : (
                     <Button
                       type="button"
-                      size="sm"
-                      variant={needsReconnect ? "default" : "outline"}
-                      disabled={!connection.authorizeUrl}
-                      onClick={() => onConnect(connection)}
+                      className="h-8 rounded-full px-4"
+                      disabled={!connection.authorizeUrl || connectingId !== null}
+                      onClick={() => {
+                        setConnectingId(connection.mcpId);
+                        onConnect(connection);
+                      }}
                     >
-                      {needsReconnect ? "Reconnect" : "Connect"}
+                      {connectingId === connection.mcpId ? (
+                        <Spinner className="size-3.5" />
+                      ) : needsReconnect ? (
+                        <ArrowsClockwiseIcon />
+                      ) : (
+                        <PlugsIcon />
+                      )}
+                      {connectingId === connection.mcpId
+                        ? "Connecting…"
+                        : needsReconnect
+                          ? "Reconnect"
+                          : "Connect"}
                     </Button>
                   )}
                 </div>
