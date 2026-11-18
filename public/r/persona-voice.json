@@ -1,0 +1,19 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "persona-voice",
+  "title": "Persona Voice Indicator & Orb",
+  "description": "Real-time bi-directional voice streaming visualizer with active microphone status.",
+  "dependencies": [
+    "@personaai/react",
+    "orb-ui",
+    "lucide-react"
+  ],
+  "files": [
+    {
+      "path": "components/persona/chat-sdk/voice-indicator.tsx",
+      "content": "\"use client\";\r\n\r\nimport * as React from \"react\";\r\nimport { Orb, type OrbState } from \"orb-ui\";\r\nimport { cn } from \"@/lib/utils\";\r\nimport type { PersonaVoiceState } from \"@personaai/react\";\r\n\r\n// Orb's own state union has no \"ended\" — a finished call reads as idle.\r\nfunction toOrbState(state: PersonaVoiceState): OrbState {\r\n  return state === \"ended\" ? \"idle\" : state;\r\n}\r\n\r\n/**\r\n * The animated voice-state orb — same `orb-ui` package\r\n * NotebookVoiceInline.js (the reference) uses, controlled rather than\r\n * adapter-driven since state/volume already come from `useVoice()`.\r\n */\r\nfunction VoiceIndicator({\r\n  state,\r\n  volume = 0,\r\n  size = 28,\r\n  className,\r\n}: {\r\n  state: PersonaVoiceState;\r\n  volume?: number;\r\n  size?: number;\r\n  className?: string;\r\n}) {\r\n  return (\r\n    <div\r\n      className={cn(\r\n        \"flex animate-in fade-in zoom-in-95 items-center justify-center duration-300\",\r\n        className\r\n      )}\r\n    >\r\n      <div className=\"flex items-center justify-center\">\r\n        <Orb\r\n          state={toOrbState(state)}\r\n          theme=\"cloud\"\r\n          size={size}\r\n          interactive={false}\r\n          aria-label={`Voice ${state}`}\r\n        />\r\n      </div>\r\n    </div>\r\n  );\r\n}\r\n\r\nexport { VoiceIndicator };\r\n",
+      "type": "registry:ui"
+    }
+  ],
+  "type": "registry:ui"
+}

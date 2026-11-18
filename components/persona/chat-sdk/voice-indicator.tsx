@@ -1,0 +1,49 @@
+"use client";
+
+import * as React from "react";
+import { Orb, type OrbState } from "orb-ui";
+import { cn } from "@/lib/utils";
+import type { PersonaVoiceState } from "@personaai/react";
+
+// Orb's own state union has no "ended" — a finished call reads as idle.
+function toOrbState(state: PersonaVoiceState): OrbState {
+  return state === "ended" ? "idle" : state;
+}
+
+/**
+ * The animated voice-state orb — same `orb-ui` package
+ * NotebookVoiceInline.js (the reference) uses, controlled rather than
+ * adapter-driven since state/volume already come from `useVoice()`.
+ */
+function VoiceIndicator({
+  state,
+  volume = 0,
+  size = 28,
+  className,
+}: {
+  state: PersonaVoiceState;
+  volume?: number;
+  size?: number;
+  className?: string;
+}) {
+  return (
+    <div
+      className={cn(
+        "flex animate-in fade-in zoom-in-95 items-center justify-center duration-300",
+        className
+      )}
+    >
+      <div className="flex items-center justify-center">
+        <Orb
+          state={toOrbState(state)}
+          theme="cloud"
+          size={size}
+          interactive={false}
+          aria-label={`Voice ${state}`}
+        />
+      </div>
+    </div>
+  );
+}
+
+export { VoiceIndicator };

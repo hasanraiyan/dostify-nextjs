@@ -1,0 +1,15 @@
+overrides:
+  '@personaai/react': '0.31.0'
+allowBuilds:
+  '@prisma/engines': true
+  prisma: true
+  unrs-resolver: true
+minimumReleaseAgeExclude:
+  - '@personaai/adapters@0.16.0'
+  - '@personaai/adapters@0.18.0'
+  - '@personaai/react@0.28.0'
+  - '@personaai/react@0.30.0'
+  - '@personaai/react@0.31.0'
+  - '@personaai/runtime@0.26.0'
+  - '@personaai/sdk@0.29.0'
+  - '@personaai/sdk@0.32.0'

@@ -1,0 +1,269 @@
+"use client";
+
+import * as React from "react";
+import { CheckCircleIcon, KeyIcon, PlugsIcon } from "@phosphor-icons/react";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
+import { Spinner } from "@/components/ui/spinner";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { cn } from "@/lib/utils";
+import type { PersonaMcpConnection } from "@personaai/react";
+
+type McpStatus = NonNullable<PersonaMcpConnection["status"]>;
+
+const STATUS_LABELS: Record<McpStatus, string> = {
+  connected: "Connected",
+  expired: "Expired",
+  needs_auth: "Needs auth",
+  not_connected: "Not connected",
+};
+
+const STATUS_DOTS: Record<McpStatus, string> = {
+  connected: "bg-emerald-500",
+  expired: "bg-destructive",
+  needs_auth: "bg-destructive",
+  not_connected: "bg-muted-foreground/50",
+};
+
+/** Backends predating `status` only send the boolean — derive the finer state. */
+function statusOf(connection: PersonaMcpConnection): McpStatus {
+  return connection.status ?? (connection.connected ? "connected" : "not_connected");
+}
+
+/** Short, locale-aware "expires" hint for connectors with a token lifetime. */
+function formatExpiry(expiresAt: string | null | undefined) {
+  if (!expiresAt) return null;
+  const date = new Date(expiresAt);
+  if (Number.isNaN(date.getTime())) return null;
+  return `Expires ${date.toLocaleDateString(undefined, { month: "short", day: "numeric" })}`;
+}
+
+function ConnectorTile({ name }: { name: string }) {
+  const initial = name.trim().charAt(0).toUpperCase() || "?";
+  return (
+    <span
+      aria-hidden="true"
+      className="flex size-8 shrink-0 items-center justify-center border border-border bg-muted/40 text-xs font-semibold text-muted-foreground"
+    >
+      {initial}
+    </span>
+  );
+}
+
+export interface McpConnectionsDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  /** Every user-mode MCP attached to the Agent (`useMcpConnections().connections`). */
+  connections: PersonaMcpConnection[];
+  /** Loads the consent flow and redirects to the provider. */
+  onConnect: (connection: PersonaMcpConnection) => void;
+  /** Revokes this end user's stored grant (DELETE …/oauth/user/connection). */
+  onRevoke: (mcpId: string) => Promise<void>;
+  /** The connector just confirmed by the OAuth callback — highlighted once. */
+  justConnectedMcpId?: string | null;
+  isLoading?: boolean;
+}
+
+/**
+ * The managing view the connect banner can't be: one row per user-mode MCP,
+ * showing whether this end user's account is connected and letting them
+ * either start the consent flow (same-tab redirect to `authorizeUrl`) or
+ * revoke the stored grant. Revoking only drops this user's token — the
+ * connector itself stays attached to the Agent.
+ */
+export function McpConnectionsDialog({
+  open,
+  onOpenChange,
+  connections,
+  onConnect,
+  onRevoke,
+  justConnectedMcpId,
+  isLoading,
+}: McpConnectionsDialogProps) {
+  const isMobile = useIsMobile();
+  const [revokingId, setRevokingId] = React.useState<string | null>(null);
+  const [error, setError] = React.useState<string | null>(null);
+
+  const handleRevoke = React.useCallback(
+    async (mcpId: string) => {
+      setRevokingId(mcpId);
+      setError(null);
+      try {
+        await onRevoke(mcpId);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Failed to revoke access.");
+      } finally {
+        setRevokingId(null);
+      }
+    },
+    [onRevoke]
+  );
+
+  const connectedCount = connections.filter((c) => statusOf(c) === "connected").length;
+
+  const body = (
+    <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
+      {isLoading && connections.length === 0 ? (
+        <ul className="divide-y divide-border" aria-busy="true">
+          {[0, 1].map((i) => (
+            <li key={i} className="flex items-center gap-3 px-4 py-3">
+              <span className="size-8 shrink-0 animate-pulse border border-border bg-muted/60" />
+              <div className="flex flex-1 flex-col gap-1.5">
+                <span className="h-3 w-32 animate-pulse bg-muted" />
+                <span className="h-2.5 w-48 animate-pulse bg-muted/70" />
+              </div>
+            </li>
+          ))}
+        </ul>
+      ) : connections.length === 0 ? (
+        <div className="flex flex-col items-center gap-2 px-4 py-8 text-center">
+          <PlugsIcon className="size-6 text-muted-foreground" />
+          <p className="text-xs text-muted-foreground">
+            No connectors are attached to this assistant.
+          </p>
+        </div>
+      ) : (
+        <ul className="divide-y divide-border">
+          {connections.map((connection) => {
+            const status = statusOf(connection);
+            const isConnected = status === "connected";
+            const needsReconnect = status === "needs_auth" || status === "expired";
+            const revoking = revokingId === connection.mcpId;
+            const justConnected = justConnectedMcpId === connection.mcpId;
+            const expiry = isConnected ? formatExpiry(connection.expiresAt) : null;
+            return (
+              <li
+                key={connection.mcpId}
+                className={cn(
+                  "flex items-start justify-between gap-3 px-4 py-3 transition-colors",
+                  justConnected && "bg-emerald-500/5"
+                )}
+              >
+                <div className="flex min-w-0 items-start gap-3">
+                  <ConnectorTile name={connection.name} />
+                  <div className="flex min-w-0 flex-col gap-1">
+                    <div className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
+                      <span className="truncate text-sm font-medium">{connection.name}</span>
+                      <span className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
+                        <span
+                          aria-hidden="true"
+                          className={cn("size-1.5 rounded-full", STATUS_DOTS[status])}
+                        />
+                        {STATUS_LABELS[status]}
+                        {justConnected && (
+                          <span className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400">
+                            <CheckCircleIcon weight="fill" className="size-3" />
+                            just now
+                          </span>
+                        )}
+                      </span>
+                    </div>
+                    {connection.description && (
+                      <span className="line-clamp-2 text-xs text-muted-foreground">
+                        {connection.description}
+                      </span>
+                    )}
+                    {connection.lastError && needsReconnect && (
+                      <span className="text-xs text-destructive">{connection.lastError}</span>
+                    )}
+                    {expiry && (
+                      <span className="text-[11px] text-muted-foreground">{expiry}</span>
+                    )}
+                  </div>
+                </div>
+                <div className="flex shrink-0 items-center gap-1">
+                  {isConnected ? (
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="ghost"
+                      className="text-muted-foreground hover:text-destructive"
+                      disabled={revoking || revokingId !== null}
+                      onClick={() => void handleRevoke(connection.mcpId)}
+                    >
+                      {revoking && <Spinner className="size-3" />}
+                      Disconnect
+                    </Button>
+                  ) : (
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant={needsReconnect ? "default" : "outline"}
+                      disabled={!connection.authorizeUrl}
+                      onClick={() => onConnect(connection)}
+                    >
+                      {needsReconnect ? "Reconnect" : "Connect"}
+                    </Button>
+                  )}
+                </div>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+      {error && <p className="px-4 pb-3 text-xs text-destructive">{error}</p>}
+    </div>
+  );
+
+  const description = `${connectedCount} of ${connections.length} connected. Revoking removes the stored access token; the connector stays attached to the assistant.`;
+
+  if (isMobile) {
+    return (
+      <Sheet open={open} onOpenChange={onOpenChange}>
+        <SheetContent
+          side="bottom"
+          className="flex w-full flex-col gap-0 overflow-hidden rounded-t-lg p-0 outline-none data-[side=bottom]:h-[70vh] data-[side=bottom]:max-h-[70vh]"
+        >
+          <SheetHeader className="flex shrink-0 flex-row items-center justify-between border-b border-border bg-muted/20 px-4 py-3">
+            <div className="flex flex-col gap-0.5">
+              <SheetTitle className="flex items-center gap-2 text-sm font-semibold tracking-tight">
+                <span className="flex size-6 items-center justify-center rounded-none bg-primary text-primary-foreground">
+                  <KeyIcon className="size-3.5" />
+                </span>
+                Connected accounts
+              </SheetTitle>
+              <SheetDescription className="text-xs text-muted-foreground">
+                {description}
+              </SheetDescription>
+            </div>
+          </SheetHeader>
+          {body}
+        </SheetContent>
+      </Sheet>
+    );
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="flex max-h-[80vh] flex-col gap-0 overflow-hidden p-0 outline-none sm:max-w-lg">
+        <DialogHeader className="flex shrink-0 flex-row items-center justify-between border-b border-border bg-muted/20 px-5 py-3">
+          <div className="flex min-w-0 flex-col gap-0.5">
+            <DialogTitle className="flex items-center gap-2 text-sm font-semibold tracking-tight">
+              <span className="flex size-6 items-center justify-center rounded-none bg-primary text-primary-foreground">
+                <KeyIcon className="size-3.5" />
+              </span>
+              Connected accounts
+            </DialogTitle>
+            <DialogDescription className="text-xs text-muted-foreground">
+              {description}
+            </DialogDescription>
+          </div>
+        </DialogHeader>
+        {body}
+      </DialogContent>
+    </Dialog>
+  );
+}

@@ -1,0 +1,129 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry.json",
+  "name": "persona",
+  "homepage": "https://persona.hasanraiyan.me",
+  "items": [
+    {
+      "name": "persona-chat",
+      "type": "registry:ui",
+      "title": "Persona Chat View",
+      "description": "Full-featured AG-UI conversational agent interface with streaming, tool execution, thinking, memory, and multi-agent coordination.",
+      "dependencies": [
+        "@personaai/react",
+        "@phosphor-icons/react",
+        "lucide-react",
+        "@modelcontextprotocol/ext-apps",
+        "@streamdown/code",
+        "streamdown",
+        "remark-gfm",
+        "recharts",
+        "orb-ui"
+      ],
+      "registryDependencies": [
+        "badge",
+        "button",
+        "card",
+        "dialog",
+        "dropdown-menu",
+        "input",
+        "scroll-area",
+        "sheet",
+        "spinner",
+        "tooltip",
+        "collapsible",
+        "skeleton"
+      ],
+      "files": [
+        { "path": "components/persona/chat-sdk/agent-picker.tsx", "type": "registry:ui" },
+        { "path": "components/persona/chat-sdk/agent-upsert-card.tsx", "type": "registry:ui" },
+        { "path": "components/persona/chat-sdk/channel-connect-dialog.tsx", "type": "registry:ui" },
+        { "path": "components/persona/chat-sdk/chat-composer.tsx", "type": "registry:ui" },
+        { "path": "components/persona/chat-sdk/chat-empty-state.tsx", "type": "registry:ui" },
+        { "path": "components/persona/chat-sdk/chat-message.tsx", "type": "registry:ui" },
+        { "path": "components/persona/chat-sdk/chat-scroller.tsx", "type": "registry:ui" },
+        { "path": "components/persona/chat-sdk/copy-button.tsx", "type": "registry:ui" },
+        { "path": "components/persona/chat-sdk/frontend-tools.tsx", "type": "registry:ui" },
+        { "path": "components/persona/chat-sdk/index.ts", "type": "registry:ui" },
+        { "path": "components/persona/chat-sdk/inline-citation.tsx", "type": "registry:ui" },
+        { "path": "components/persona/chat-sdk/interrupt-panel.tsx", "type": "registry:ui" },
+        { "path": "components/persona/chat-sdk/mcp-app-embed-context.ts", "type": "registry:ui" },
+        { "path": "components/persona/chat-sdk/mcp-app-renderer.tsx", "type": "registry:ui" },
+        { "path": "components/persona/chat-sdk/mcp-connect-banner.tsx", "type": "registry:ui" },
+        { "path": "components/persona/chat-sdk/mcp-connections-dialog.tsx", "type": "registry:ui" },
+        { "path": "components/persona/chat-sdk/memory-workspace-dialog.tsx", "type": "registry:ui" },
+        { "path": "components/persona/chat-sdk/message-content-with-svg.tsx", "type": "registry:ui" },
+        { "path": "components/persona/chat-sdk/message-grouping.ts", "type": "registry:ui" },
+        { "path": "components/persona/chat-sdk/message-markdown.tsx", "type": "registry:ui" },
+        { "path": "components/persona/chat-sdk/persona-chat-fab.tsx", "type": "registry:ui" },
+        { "path": "components/persona/chat-sdk/persona-chat-view.tsx", "type": "registry:ui" },
+        { "path": "components/persona/chat-sdk/reasoning-block.tsx", "type": "registry:ui" },
+        { "path": "components/persona/chat-sdk/sandbox-terminal-dialog.tsx", "type": "registry:ui" },
+        { "path": "components/persona/chat-sdk/subagent-sheet.tsx", "type": "registry:ui" },
+        { "path": "components/persona/chat-sdk/thinking-indicator.tsx", "type": "registry:ui" },
+        { "path": "components/persona/chat-sdk/todo-checklist.tsx", "type": "registry:ui" },
+        { "path": "components/persona/chat-sdk/tool-call-card.tsx", "type": "registry:ui" },
+        { "path": "components/persona/chat-sdk/tool-call-trace.tsx", "type": "registry:ui" },
+        { "path": "components/persona/chat-sdk/tool-status.ts", "type": "registry:ui" },
+        { "path": "components/persona/chat-sdk/tool-widgets.tsx", "type": "registry:ui" },
+        { "path": "components/persona/chat-sdk/use-persona-chat-widget.ts", "type": "registry:ui" },
+        { "path": "components/persona/chat-sdk/voice-indicator.tsx", "type": "registry:ui" },
+        { "path": "components/persona/chat-sdk/tool-cards/diff-view.tsx", "type": "registry:ui" },
+        { "path": "components/persona/chat-sdk/tool-cards/dot-matrix-loader.tsx", "type": "registry:ui" },
+        { "path": "components/persona/chat-sdk/tool-cards/grep-results-view.tsx", "type": "registry:ui" },
+        { "path": "components/persona/chat-sdk/tool-cards/image-artifact-card.tsx", "type": "registry:ui" },
+        { "path": "components/persona/chat-sdk/tool-cards/json-tree-view.tsx", "type": "registry:ui" },
+        { "path": "components/persona/chat-sdk/tool-cards/ls-directory-card.tsx", "type": "registry:ui" },
+        { "path": "components/persona/chat-sdk/tool-cards/read-file-card.tsx", "type": "registry:ui" },
+        { "path": "components/persona/chat-sdk/tool-cards/request-response-panel.tsx", "type": "registry:ui" },
+        { "path": "components/persona/chat-sdk/tool-cards/search-citation-card.tsx", "type": "registry:ui" },
+        { "path": "components/persona/chat-sdk/tool-cards/snake-mini-game.tsx", "type": "registry:ui" },
+        { "path": "components/persona/chat-sdk/tool-cards/utils.ts", "type": "registry:ui" }
+      ]
+    },
+    {
+      "name": "persona-chat-fab",
+      "type": "registry:ui",
+      "title": "Persona Chat Floating Action Button",
+      "description": "Floating chat bubble trigger for embedding Persona AI assistant in any web page.",
+      "dependencies": [
+        "@personaai/react",
+        "@phosphor-icons/react",
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "button",
+        "sheet",
+        "dialog"
+      ],
+      "files": [
+        { "path": "components/persona/chat-sdk/persona-chat-fab.tsx", "type": "registry:ui" }
+      ]
+    },
+    {
+      "name": "persona-voice",
+      "type": "registry:ui",
+      "title": "Persona Voice Indicator & Orb",
+      "description": "Real-time bi-directional voice streaming visualizer with active microphone status.",
+      "dependencies": [
+        "@personaai/react",
+        "orb-ui",
+        "lucide-react"
+      ],
+      "files": [
+        { "path": "components/persona/chat-sdk/voice-indicator.tsx", "type": "registry:ui" }
+      ]
+    },
+    {
+      "name": "persona-nextjs-adapter",
+      "type": "registry:block",
+      "title": "Persona Next.js Catch-All Route Handler",
+      "description": "Next.js App Router catch-all route handler for Persona AG-UI protocol and multi-channel webhooks.",
+      "dependencies": [
+        "@personaai/adapters"
+      ],
+      "files": [
+        { "path": "app/api/persona/[...persona]/route.ts", "type": "registry:block", "target": "app/api/persona/[...persona]/route.ts" }
+      ]
+    }
+  ]
+}
