@@ -61,6 +61,7 @@ export function useMcpConnect({ agentId }: { agentId?: string }) {
     disconnect,
     isDisconnecting,
     isLoading,
+    error,
     refetch,
   } = useMcpConnections({ agentId });
 
@@ -179,6 +180,7 @@ export function useMcpConnect({ agentId }: { agentId?: string }) {
     disconnect,
     isDisconnecting,
     isLoading,
+    error,
     refetch,
     connect,
     notice: liveNotice,

@@ -10,8 +10,36 @@ import { AGENTS } from "@/app/agents";
 const SUCCESS_NOTICE_MS = 8000;
 
 export function ConnectorsView() {
-  const { connections, unconnected, disconnect, isLoading, connect, notice, dismissNotice } =
+  const { connections, unconnected, disconnect, isLoading, error, connect, notice, dismissNotice } =
     useMcpConnect({ agentId: AGENTS[0].agentId });
+
+  // Dev only: print exactly what the API returned, so the UI can be designed
+  // (or hardcoded) against the real shape. The consent URL is reduced to its
+  // origin and path because its query carries OAuth state.
+  React.useEffect(() => {
+    if (process.env.NODE_ENV === "production" || isLoading) return;
+    const safe = connections.map(({ authorizeUrl, ...rest }) => {
+      let authorize: string | null = null;
+      if (authorizeUrl) {
+        try {
+          const u = new URL(authorizeUrl);
+          authorize = `${u.origin}${u.pathname} (+query hidden)`;
+        } catch {
+          authorize = "(unparseable URL)";
+        }
+      }
+      return { ...rest, authorizeUrl: authorize };
+    });
+    console.groupCollapsed(
+      `[connectors] ${connections.length} attached, ${unconnected.length} not connected` +
+        (error ? ` — ERROR: ${error.message}` : ""),
+    );
+    if (error) console.error("[connectors] fetch error:", error);
+    if (safe.length) console.table(safe);
+    console.log("[connectors] raw JSON:", JSON.stringify(safe, null, 2));
+    console.log("[connectors] pending OAuth notice:", notice);
+    console.groupEnd();
+  }, [connections, unconnected.length, isLoading, error, notice]);
 
   React.useEffect(() => {
     if (notice?.kind !== "success") return;
