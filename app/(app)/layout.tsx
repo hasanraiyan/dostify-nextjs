@@ -1,7 +1,7 @@
-﻿import { auth } from "@clerk/nextjs/server";
+import { auth } from "@clerk/nextjs/server";
 import { Suspense } from "react";
 import type { ReactNode } from "react";
-import { ChatShell } from "./chat-shell";
+import { AppShell } from "@/components/dostify/app-shell";
 import { syncClerkUser } from "@/lib/sync-user";
 
 async function SyncClerkUser() {
@@ -13,16 +13,16 @@ async function SyncClerkUser() {
   return null;
 }
 
-export default function ChatLayout({ children }: { children: ReactNode }) {
-  // usePathname() suspends while prerendering the unknown [threadId] param;
-  // the chat is client-only anyway, so stream it in behind this boundary.
+/** Shared by the chat and the dashboard pages: one sidebar, one set of providers. */
+export default function AppLayout({ children }: { children: ReactNode }) {
   return (
     <>
       <Suspense fallback={null}>
         <SyncClerkUser />
       </Suspense>
+      {/* The shell reads the pathname (request-time data), so it needs a boundary. */}
       <Suspense fallback={null}>
-        <ChatShell>{children}</ChatShell>
+        <AppShell>{children}</AppShell>
       </Suspense>
     </>
   );

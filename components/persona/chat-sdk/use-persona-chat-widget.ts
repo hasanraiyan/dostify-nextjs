@@ -13,6 +13,7 @@ import {
   type PersonaStreamingEvent,
   type SendMessageOverride,
 } from "@personaai/react";
+import { useSharedThreads, useStalledFlag } from "./threads-context";
 import { groupReasoning } from "./message-grouping";
 
 /** Shared empty set — a stable identity keeps the no-blocked-tools case a no-op. */
@@ -119,6 +120,11 @@ export function usePersonaChatWidget(options: UsePersonaChatWidgetOptions = {}) 
   const isControlled = onThreadChange !== undefined;
   const activeThreadId = isControlled ? controlledThreadId : internalThreadId;
 
+  // Use the app-wide thread list when there is one (so the sidebar shares it);
+  // otherwise fetch our own. The hook is always called, but only fetches when
+  // there is no shared list.
+  const sharedThreads = useSharedThreads();
+  const ownThreads = useThreads(!sharedThreads);
   const {
     threads,
     createThread,
@@ -126,23 +132,13 @@ export function usePersonaChatWidget(options: UsePersonaChatWidgetOptions = {}) 
     renameThread,
     refetch: refreshThreads,
     isLoading: threadsLoading,
-  } = useThreads();
+  } = sharedThreads ?? ownThreads;
 
-  // The SDK's thread fetch has no timeout, so a stalled request would leave the
-  // sidebar skeleton up forever. Flag it after a while so the UI can offer a retry.
-  const [threadsStalled, setThreadsStalled] = useState(false);
-  useEffect(() => {
-    if (!threadsLoading) {
-      setThreadsStalled(false);
-      return;
-    }
-    const timer = setTimeout(() => setThreadsStalled(true), 12_000);
-    return () => clearTimeout(timer);
-  }, [threadsLoading]);
+  const [threadsStalled, setThreadsStalled] = useStalledFlag(threadsLoading);
   const retryThreads = useCallback(() => {
     setThreadsStalled(false);
     void refreshThreads();
-  }, [refreshThreads]);
+  }, [refreshThreads, setThreadsStalled]);
   const { files: uploadedFiles, uploadFile, deleteFile, isLoading: filesLoading } = useFiles();
 
   // Always called (hooks can't be conditional) — cheap until voice.start()

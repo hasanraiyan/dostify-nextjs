@@ -3,23 +3,17 @@
 import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { MagnifyingGlassIcon, PencilSimpleLineIcon, PushPinIcon, XIcon } from "@phosphor-icons/react";
+import { MagnifyingGlassIcon, PushPinIcon, XIcon } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
-import { splitText } from "./entry-text";
+import { Skeleton } from "@/components/ui/skeleton";
+import { splitText } from "@/lib/dostify/entry-text";
+import type { JournalListEntry } from "@/lib/dostify/journal-types";
+import { useJournalList } from "./journal-list-context";
 
-export interface ListEntry {
-  id: string;
-  text: string;
-  pinned: boolean;
-  time: string;
-  dayKey: string;
-  dayLabel: string;
-}
-
-type Group = { key: string; label: string; items: ListEntry[] };
+type Group = { key: string; label: string; items: JournalListEntry[] };
 
 /** Pinned first, then by day. `entries` arrive newest first. */
-function group(entries: ListEntry[]): Group[] {
+function group(entries: JournalListEntry[]): Group[] {
   const groups: Group[] = [];
   const pinned = entries.filter((e) => e.pinned);
   if (pinned.length) groups.push({ key: "pinned", label: "Pinned", items: pinned });
@@ -31,9 +25,15 @@ function group(entries: ListEntry[]): Group[] {
   return groups;
 }
 
-export function EntryListPane({ entries }: { entries: ListEntry[] }) {
+/** New-entry button, search and the entries list. Lives in the sidebar. */
+export function JournalPanel({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname();
+  const { entries, loaded, failed, ensureLoaded, refresh } = useJournalList();
   const [query, setQuery] = React.useState("");
+
+  React.useEffect(() => {
+    ensureLoaded();
+  }, [ensureLoaded]);
 
   const q = query.trim().toLowerCase();
   const visible = q ? entries.filter((e) => e.text.toLowerCase().includes(q)) : entries;
@@ -41,17 +41,7 @@ export function EntryListPane({ entries }: { entries: ListEntry[] }) {
 
   return (
     <>
-      <div className="flex flex-col gap-3 p-3">
-        <div className="flex items-center justify-between gap-2">
-          <h1 className="font-heading text-xl font-semibold">Journal</h1>
-          <Link
-            href="/journal/new"
-            aria-label="New entry"
-            className="flex size-8 items-center justify-center rounded-full bg-primary text-primary-foreground transition-opacity hover:opacity-90"
-          >
-            <PencilSimpleLineIcon className="size-4" />
-          </Link>
-        </div>
+      <div className="flex flex-col gap-2 p-3">
         <div className="relative">
           <MagnifyingGlassIcon className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
           <input
@@ -76,7 +66,24 @@ export function EntryListPane({ entries }: { entries: ListEntry[] }) {
       </div>
 
       <nav aria-label="Journal entries" className="min-h-0 flex-1 overflow-y-auto px-2 pb-3">
-        {groups.length === 0 ? (
+        {!loaded ? (
+          <div className="flex flex-col gap-2 px-1" role="status" aria-label="Loading entries">
+            {[0, 1, 2, 3].map((i) => (
+              <Skeleton key={i} className="skeleton-shimmer h-12 animate-none rounded-xl" />
+            ))}
+          </div>
+        ) : failed && entries.length === 0 ? (
+          <p className="px-2 py-6 text-center text-sm text-muted-foreground">
+            Couldn&apos;t load entries.{" "}
+            <button
+              type="button"
+              onClick={() => void refresh()}
+              className="font-medium text-foreground underline underline-offset-2"
+            >
+              Retry
+            </button>
+          </p>
+        ) : groups.length === 0 ? (
           <p className="px-2 py-6 text-center text-sm text-muted-foreground">
             {q ? "No matching entries." : "No entries yet."}
           </p>
@@ -95,6 +102,7 @@ export function EntryListPane({ entries }: { entries: ListEntry[] }) {
                     <li key={e.id}>
                       <Link
                         href={href}
+                        onClick={onNavigate}
                         aria-current={active ? "page" : undefined}
                         className={cn(
                           "flex flex-col gap-0.5 rounded-xl px-3 py-2 transition-colors",

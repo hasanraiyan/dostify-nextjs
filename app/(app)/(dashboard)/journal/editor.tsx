@@ -6,7 +6,8 @@ import { useRouter } from "next/navigation";
 import { ArrowLeftIcon, PushPinIcon, TrashIcon } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { deleteEntry, saveEntry, togglePin } from "./actions";
-import { joinText, splitText } from "./entry-text";
+import { useJournalList } from "@/components/dostify/journal-list-context";
+import { joinText, splitText } from "@/lib/dostify/entry-text";
 
 export interface EditorEntry {
   /** null for a brand-new entry: it's created on the first autosave. */
@@ -22,6 +23,7 @@ const AUTOSAVE_MS = 800;
 /** Notes-style editor: title and body are borderless, and it saves as you type. */
 export function Editor({ entry }: { entry: EditorEntry }) {
   const router = useRouter();
+  const { refresh: refreshList } = useJournalList();
   const initial = React.useMemo(() => splitText(entry.text), [entry.text]);
   const [title, setTitle] = React.useState(initial.title);
   const [body, setBody] = React.useState(initial.body);
@@ -61,11 +63,12 @@ export function Editor({ entry }: { entry: EditorEntry }) {
           window.history.replaceState(null, "", `/journal/${res.id}`);
         }
         setStatus("saved");
+        void refreshList();
       } catch {
         setStatus("error");
       }
     });
-  }, []);
+  }, [refreshList]);
 
   const change = (nextTitle: string, nextBody: string) => {
     latest.current = { title: nextTitle, body: nextBody };
@@ -89,12 +92,14 @@ export function Editor({ entry }: { entry: EditorEntry }) {
     const next = !pinned;
     setPinned(next);
     await togglePin(idRef.current, next);
+    void refreshList();
   };
 
   const onDelete = async () => {
     dirty.current = false;
     clearTimeout(timer.current);
     if (idRef.current) await deleteEntry(idRef.current);
+    void refreshList();
     router.push("/journal");
   };
 
