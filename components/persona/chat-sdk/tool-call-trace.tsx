@@ -4,6 +4,7 @@ import * as React from "react";
 import { ItemGroup } from "@/components/ui/item";
 import { ToolCallCard } from "./tool-call-card";
 import { McpAppRenderer } from "./mcp-app-renderer";
+import { renderDostifyTool } from "./dostify-tool-ui";
 import { toolCallStatus } from "./tool-status";
 import { useRenderToolCall, type PersonaToolCall, type PersonaTodo } from "@personaai/react";
 
@@ -76,7 +77,8 @@ function ToolCallTrace({
   for (const tc of toolCalls) {
     logToolCall(tc);
     groupKey ??= tc.toolCallId;
-    const customUi = renderToolCall(tc);
+    // A renderer registered with the SDK wins; then our own cards; else null.
+    const customUi = renderToolCall(tc) ?? renderDostifyTool(tc);
     if (customUi) {
       currentGroup.push(
         // p-px: Card draws its outline as `ring-1` (a box-shadow *outside* the

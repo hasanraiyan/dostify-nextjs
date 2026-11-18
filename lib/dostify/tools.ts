@@ -60,6 +60,7 @@ interface JournalArgs {
   limit?: number
   since?: string
   until?: string
+  confirm?: boolean
 }
 
 const needId = (a: JournalArgs) => {
@@ -84,7 +85,7 @@ export function registerDostifyTools(server: McpServer) {
         '- get: one entry by `id`.',
         '- create: a new entry. Needs `body`; `title` is optional. Optional mood (1-5) and pinned.',
         '- update: change an entry by `id`. Pass ONLY what should change (title, body, mood, pinned); the rest is kept. Use pinned to pin or unpin. `mood: null` clears the mood.',
-        '- delete: permanently remove an entry by `id`. Confirm with the user first.',
+        '- delete: permanently remove an entry by `id`. Ask the user to confirm first (confirm_action), then call again with `confirm: true`; without it the delete is refused.',
         'An entry is a title plus a body. Find an `id` with list or search before get, update or delete. Dates (since, until) are ISO 8601 with an offset, e.g. 2026-11-18T00:00:00+05:30.',
       ].join('\n'),
       annotations: { destructiveHint: true },
@@ -99,6 +100,7 @@ export function registerDostifyTools(server: McpServer) {
         limit: z.number().int().min(1).max(50).optional().describe('How many entries (list, search). Default 10.'),
         since: isoDate.optional().describe('Only entries created at or after this time (list, search).'),
         until: isoDate.optional().describe('Only entries created before this time (list, search).'),
+        confirm: z.boolean().optional().describe('Must be true to delete, and only after the user agreed.'),
       }),
     },
     tool(async (a: JournalArgs, userId) => {
@@ -152,6 +154,9 @@ export function registerDostifyTools(server: McpServer) {
           return present(entry)
         }
         case 'delete': {
+          if (a.confirm !== true) {
+            throw new Error('Not deleted: ask the user to confirm first (use confirm_action), then call delete again with confirm: true.')
+          }
           if (!(await deleteEntry(userId, needId(a)))) throw new Error('Entry not found.')
           return { deleted: true }
         }
