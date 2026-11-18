@@ -63,7 +63,7 @@ export function registerDostifyTools(server: McpServer) {
       inputSchema: z.object({ limit: z.number().int().min(1).max(50).default(10) }),
     },
     tool(async (a: { limit: number }, userId) => {
-      return listEntries(userId, a.limit)
+      return listEntries(userId, { limit: a.limit })
     }),
   )
 

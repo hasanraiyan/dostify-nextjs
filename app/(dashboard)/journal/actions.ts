@@ -3,7 +3,12 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { getCurrentDbUser } from "@/lib/dostify/current-user";
-import { createEntry, deleteEntry as removeEntry, updateEntryText } from "@/lib/dostify/journal";
+import {
+  createEntry,
+  deleteEntry as removeEntry,
+  setEntryPinned,
+  updateEntryText,
+} from "@/lib/dostify/journal";
 
 const text = z.string().trim().min(1).max(5000);
 
@@ -35,5 +40,13 @@ export async function deleteEntry(formData: FormData) {
   const id = formData.get("id");
   if (typeof id !== "string") return;
   await removeEntry(user.id, id);
+  revalidatePath("/journal");
+}
+
+export async function togglePin(formData: FormData) {
+  const user = await requireUser();
+  const id = formData.get("id");
+  if (typeof id !== "string") return;
+  await setEntryPinned(user.id, id, formData.get("pinned") === "true");
   revalidatePath("/journal");
 }

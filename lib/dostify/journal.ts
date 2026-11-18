@@ -6,9 +6,11 @@ import { prisma } from '@/lib/prisma'
  * can never read or change another's entries.
  */
 
-export function listEntries(userId: string, limit = 100) {
+export function listEntries(userId: string, opts: { limit?: number; query?: string } = {}) {
+  const { limit = 100, query } = opts
+  const q = query?.trim()
   return prisma.journalEntry.findMany({
-    where: { userId },
+    where: { userId, ...(q && { text: { contains: q, mode: 'insensitive' as const } }) },
     orderBy: { createdAt: 'desc' },
     take: limit,
   })
@@ -27,6 +29,12 @@ export async function updateEntryText(userId: string, id: string, text: string) 
 /** Returns true if an entry of this user was deleted. */
 export async function deleteEntry(userId: string, id: string) {
   const { count } = await prisma.journalEntry.deleteMany({ where: { id, userId } })
+  return count > 0
+}
+
+/** Returns true if an entry of this user was updated. */
+export async function setEntryPinned(userId: string, id: string, pinned: boolean) {
+  const { count } = await prisma.journalEntry.updateMany({ where: { id, userId }, data: { pinned } })
   return count > 0
 }
 

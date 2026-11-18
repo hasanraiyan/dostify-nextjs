@@ -1,26 +1,34 @@
 "use client";
 
 import * as React from "react";
-import { PencilSimpleIcon, TrashIcon } from "@phosphor-icons/react";
+import { PencilSimpleIcon, PushPinIcon, TrashIcon } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
-import { deleteEntry, updateEntry } from "./actions";
-
-/** Entries longer than this are clamped until "Aur padho" is pressed. */
-const CLAMP_CHARS = 300;
+import { deleteEntry, togglePin, updateEntry } from "./actions";
 
 export interface EntryCardData {
   id: string;
   text: string;
+  pinned: boolean;
   /** Pre-formatted on the server so server and client always agree. */
   time: string;
+}
+
+/** Notes-style split: first line is the title, the rest is the body. */
+function splitEntry(text: string) {
+  const lines = text.trim().split("\n");
+  const title = lines[0] ?? "";
+  const body = lines.slice(1).join("\n").trim();
+  return { title, body };
 }
 
 export function EntryCard({ entry }: { entry: EntryCardData }) {
   const [mode, setMode] = React.useState<"view" | "edit" | "confirmDelete">("view");
   const [expanded, setExpanded] = React.useState(false);
-  const long = entry.text.length > CLAMP_CHARS;
+  const { title, body } = splitEntry(entry.text);
+  // A card can be opened if there's more than the title, or the title itself is long.
+  const expandable = body.length > 0 || title.length > 80;
 
   return (
     <Card size="sm">
@@ -54,24 +62,33 @@ export function EntryCard({ entry }: { entry: EntryCardData }) {
           </form>
         ) : (
           <>
-            <p
-              className={`whitespace-pre-wrap break-words text-sm ${
-                long && !expanded ? "line-clamp-6" : ""
-              }`}
+            <button
+              type="button"
+              disabled={!expandable}
+              onClick={() => setExpanded((e) => !e)}
+              aria-expanded={expandable ? expanded : undefined}
+              className="flex flex-col gap-0.5 text-left disabled:cursor-default"
             >
-              {entry.text}
-            </p>
-            {long && (
-              <button
-                type="button"
-                onClick={() => setExpanded((e) => !e)}
-                className="self-start text-xs font-medium text-primary underline-offset-2 hover:underline"
+              <span
+                className={`text-sm font-semibold break-words ${expanded ? "" : "line-clamp-1"}`}
               >
-                {expanded ? "Kam dikhao" : "Aur padho"}
-              </button>
-            )}
+                {title}
+              </span>
+              {body && (
+                <span
+                  className={`text-sm break-words whitespace-pre-wrap text-muted-foreground ${
+                    expanded ? "" : "line-clamp-2"
+                  }`}
+                >
+                  {body}
+                </span>
+              )}
+            </button>
             <div className="flex items-center justify-between gap-2">
-              <span className="text-xs text-muted-foreground">{entry.time}</span>
+              <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                {entry.pinned && <PushPinIcon weight="fill" className="size-3 text-primary" />}
+                {entry.time}
+              </span>
               {mode === "confirmDelete" ? (
                 <form action={deleteEntry} className="flex items-center gap-2">
                   <input type="hidden" name="id" value={entry.id} />
@@ -85,6 +102,19 @@ export function EntryCard({ entry }: { entry: EntryCardData }) {
                 </form>
               ) : (
                 <div className="flex gap-1">
+                  <form action={togglePin}>
+                    <input type="hidden" name="id" value={entry.id} />
+                    <input type="hidden" name="pinned" value={String(!entry.pinned)} />
+                    <Button
+                      type="submit"
+                      size="icon-sm"
+                      variant="ghost"
+                      className="rounded-full"
+                      aria-label={entry.pinned ? "Unpin entry" : "Pin entry"}
+                    >
+                      <PushPinIcon weight={entry.pinned ? "fill" : "regular"} />
+                    </Button>
+                  </form>
                   <Button
                     type="button"
                     size="icon-sm"

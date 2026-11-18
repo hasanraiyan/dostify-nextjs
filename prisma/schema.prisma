@@ -30,6 +30,7 @@ model JournalEntry {
   /// 1 (very low) to 5 (great); optional.
   mood      Int?
   text      String
+  pinned    Boolean  @default(false)
   createdAt DateTime @default(now())
 
   @@index([userId, createdAt])

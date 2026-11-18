@@ -3,22 +3,32 @@ import { dayKey, dayLabel, timeLabel } from "@/lib/dostify/dates";
 import { listEntries } from "@/lib/dostify/journal";
 import { EntryCard } from "./entry-card";
 
-/** The user's entries, grouped by day (Aaj, Kal, then dates), newest first. */
-export async function EntryList() {
+type Entry = Awaited<ReturnType<typeof listEntries>>[number];
+
+/**
+ * The user's entries: pinned ones first, then grouped by day (Aaj, Kal, then
+ * dates), newest first. With a search query, matches only.
+ */
+export async function EntryList({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
+  const { q } = await searchParams;
+  const query = q?.trim() || undefined;
+
   const user = await getCurrentDbUser();
-  const entries = user ? await listEntries(user.id) : [];
+  const entries = user ? await listEntries(user.id, { query }) : [];
 
   if (entries.length === 0) {
     return (
       <p className="rounded-xl border border-dashed p-6 text-center text-sm text-muted-foreground">
-        Abhi koi entry nahi hai.
+        {query ? "Kuch nahi mila." : "Abhi koi entry nahi hai."}
       </p>
     );
   }
 
   const now = new Date();
-  const groups: { key: string; label: string; items: typeof entries }[] = [];
-  for (const entry of entries) {
+  const groups: { key: string; label: string; items: Entry[] }[] = [];
+  const pinned = entries.filter((e) => e.pinned);
+  if (pinned.length) groups.push({ key: "pinned", label: "Pinned", items: pinned });
+  for (const entry of entries.filter((e) => !e.pinned)) {
     const key = dayKey(entry.createdAt);
     const last = groups[groups.length - 1];
     if (last?.key === key) last.items.push(entry);
@@ -35,7 +45,9 @@ export async function EntryList() {
           <ul className="flex flex-col gap-2">
             {g.items.map((e) => (
               <li key={e.id}>
-                <EntryCard entry={{ id: e.id, text: e.text, time: timeLabel(e.createdAt) }} />
+                <EntryCard
+                  entry={{ id: e.id, text: e.text, pinned: e.pinned, time: timeLabel(e.createdAt) }}
+                />
               </li>
             ))}
           </ul>
