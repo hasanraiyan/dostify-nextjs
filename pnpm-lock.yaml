@@ -188,8 +188,8 @@ importers:
         specifier: 0.31.0
         version: 0.31.0(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       '@personaai/runtime':
-        specifier: 0.26.0
-        version: 0.26.0(zod@4.6.7)
+        specifier: 0.27.0
+        version: 0.27.0(zod@4.6.7)
       '@personaai/sdk':
         specifier: ^0.32.0
         version: 0.32.0(zod@4.6.7)
@@ -1004,6 +1004,10 @@ packages:
 
   '@personaai/runtime@0.26.0':
     resolution: {integrity: sha512-vX1nu+1CSDXPPpiljq14/GlA1PkOTtF+1t2UfOqiV6U67NL1NwoQl7LYeIuF5dVVJK4B0bmOcj+kxy06A/qymA==}
+    engines: {node: '>=18'}
+
+  '@personaai/runtime@0.27.0':
+    resolution: {integrity: sha512-YS63XqCX/DID5pn/RZV81wbqSZfPAYsjMk45AsTk18+kAuUrI21dpqOiHLAa2FxGc5vrWVjRTyZAJ70aRBghIw==}
     engines: {node: '>=18'}
 
   '@personaai/sdk@0.29.0':
@@ -5504,6 +5508,14 @@ snapshots:
     dependencies:
       '@ag-ui/core': 0.0.57
       '@personaai/sdk': 0.29.0(zod@4.6.7)
+      rcp-sdk: 0.1.1
+    transitivePeerDependencies:
+      - zod
+
+  '@personaai/runtime@0.27.0(zod@4.6.7)':
+    dependencies:
+      '@ag-ui/core': 0.0.57
+      '@personaai/sdk': 0.32.0(zod@4.6.7)
       rcp-sdk: 0.1.1
     transitivePeerDependencies:
       - zod
