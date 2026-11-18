@@ -3,6 +3,7 @@
 import * as React from "react";
 import { useVoice } from "@personaai/react";
 import type { AvatarPack } from "@personaai/avatar";
+import type { AvatarId } from "@/lib/dostify/avatar-config";
 import { VoiceDock } from "./voice-dock";
 
 /**
@@ -29,6 +30,8 @@ export interface VoiceFabProps {
   hideWhenIdle?: boolean;
   /** Avatar pack to use for the avatar (defaults to sakura, via AnimeVoiceAvatar) */
   pack?: AvatarPack;
+  /** Active avatar preference ("sakura" | "scarlet" | "orb") */
+  avatarId?: AvatarId;
   /**
    * Optional proactive greeting trigger.
    * If string, sends that prompt immediately once connected so the model speaks first.
@@ -44,6 +47,7 @@ export function VoiceFab({
   environment = "production",
   hideWhenIdle = false,
   pack,
+  avatarId,
   proactiveGreeting,
 }: VoiceFabProps) {
   const voice = useVoice({
@@ -81,5 +85,5 @@ export function VoiceFab({
   );
 
   if (hideWhenIdle && !live) return null;
-  return <VoiceDock voice={voice} pack={pack} onStart={handleStart} />;
+  return <VoiceDock voice={voice} pack={pack} avatarId={avatarId} onStart={handleStart} />;
 }

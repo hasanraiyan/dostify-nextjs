@@ -14,6 +14,8 @@ import type { Avatar, AvatarPack } from "@personaai/avatar";
 import { playGoodbye } from "@personaai/avatar/persona";
 import { cn } from "@/lib/utils";
 import { VoiceIndicator } from "./voice-indicator";
+import type { AvatarId } from "@/lib/dostify/avatar-config";
+import { useAvatarPref } from "@/components/dostify/use-avatar-pref";
 
 /** How long the last spoken line stays on screen once nobody is speaking. */
 const CAPTION_LINGER_MS = 4500;
@@ -117,17 +119,23 @@ const RING: Record<string, string> = {
 export function VoiceDock({
   voice,
   pack,
+  avatarId: propAvatarId,
   onExpand,
   onStart,
 }: {
   voice: UseVoiceResult;
   /** Avatar pack to use for the avatar (default: sakura, via AnimeVoiceAvatar) */
   pack?: AvatarPack;
+  /** Active avatar preference ("sakura" | "scarlet" | "orb") */
+  avatarId?: AvatarId;
   /** Adds an "open chat" badge. Omit for a voice-only launcher. */
   onExpand?: () => void;
   /** Tapping the circle while no call is running starts one. */
   onStart?: () => void;
 }) {
+  const { avatarId: prefAvatarId } = useAvatarPref();
+  const avatarId = propAvatarId ?? prefAvatarId;
+  const isOrb = avatarId === "orb";
   const caption = useVanishingCaption(voice);
   const [small, setSmall] = React.useState(false);
   const [saying, setSaying] = React.useState(false);
@@ -299,17 +307,18 @@ export function VoiceDock({
         >
           {/* The art is a square with empty space under the shoulders, which
               left a dark gap inside the circle. Scale it up and push it down so
-              the shoulders run off the bottom edge and the circle is filled. */}
+              the shoulders run off the bottom edge and the circle is filled.
+              When Orb is selected, center it cleanly without the shoulder offset. */}
           <div
-            className="size-full origin-center"
-            style={{ transform: "translateY(10.5%) scale(1.35)" }}
+            className={cn("size-full origin-center", isOrb && "flex items-center justify-center")}
+            style={isOrb ? undefined : { transform: "translateY(10.5%) scale(1.35)" }}
           >
             <VoiceIndicator
               state={voice.state}
               voice={voice}
               pack={pack}
               size={!active ? 64 : small ? 60 : 120}
-              variant="avatar"
+              variant={isOrb ? "orb" : "avatar"}
               onAvatarReady={(a) => {
                 avatarRef.current = a;
               }}

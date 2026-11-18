@@ -370,7 +370,7 @@ export function PersonaChatView({
     enableVoice: showVoice,
   });
 
-  const { pack: avatarPack } = useAvatarPref();
+  const { pack: avatarPack, avatarId } = useAvatarPref();
   const callDuration = useCallTimer(isVoiceActive);
   const inViewAvatarRef = React.useRef<Avatar | null>(null);
 
@@ -779,7 +779,12 @@ export function PersonaChatView({
           >
             {/* Compact voice dock when minimized */}
             {voiceDockVisible && isVoiceActive && onVoiceDockExpand && (
-              <VoiceDock voice={voice} onExpand={onVoiceDockExpand} />
+              <VoiceDock
+                voice={voice}
+                pack={avatarPack}
+                avatarId={avatarId}
+                onExpand={onVoiceDockExpand}
+              />
             )}
 
             {/* Only occupies space while a call is actually live — the idle
@@ -798,15 +803,22 @@ export function PersonaChatView({
                     )}
                   >
                     <div
-                      className="size-full origin-center"
-                      style={{ transform: "translateY(10.5%) scale(1.35)" }}
+                      className={cn(
+                        "size-full origin-center",
+                        avatarId === "orb" && "flex items-center justify-center"
+                      )}
+                      style={
+                        avatarId === "orb"
+                          ? undefined
+                          : { transform: "translateY(10.5%) scale(1.35)" }
+                      }
                     >
                       <VoiceIndicator
                         state={voice.state}
                         voice={voice}
                         pack={avatarPack}
-                        size={208}
-                        variant="avatar"
+                        size={avatarId === "orb" ? 160 : 208}
+                        variant={avatarId === "orb" ? "orb" : "avatar"}
                         onAvatarReady={(a) => {
                           inViewAvatarRef.current = a;
                         }}

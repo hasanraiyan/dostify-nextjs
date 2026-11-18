@@ -10,7 +10,7 @@ export const metadata: Metadata = { title: "Profile — Dostify" };
 
 export default function ProfilePage() {
   return (
-    <div className="mx-auto flex w-full max-w-2xl flex-col gap-4">
+    <div className="mx-auto flex w-full max-w-2xl flex-col gap-4 pb-12">
       <h1 className="font-heading text-2xl font-semibold">Profile</h1>
       <Suspense
         fallback={

@@ -25,6 +25,7 @@ import { AVATAR_OPTIONS, type AvatarId } from "@/lib/dostify/avatar-config";
 import { useAvatarPref } from "@/components/dostify/use-avatar-pref";
 import { saveUserAvatarChoice } from "@/lib/dostify/avatar-actions";
 import { AnimeVoiceAvatar } from "@/components/persona/avatar";
+import { Orb } from "orb-ui";
 
 const THEMES: { value: ThemePref; label: string; icon: Icon }[] = [
   { value: "light", label: "Light", icon: SunIcon },
@@ -133,8 +134,8 @@ export function ProfileView({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {/* Two across on phones, three from sm. */}
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+          {/* Two across on phones, four on sm. */}
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             {AVATAR_OPTIONS.map((opt) => {
               const selected = avatarId === opt.id;
               return (
@@ -149,19 +150,29 @@ export function ProfileView({
                     selected ? "border-foreground" : "border-border hover:bg-muted",
                   )}
                 >
-                  <span className="relative block size-[4.5rem] overflow-hidden rounded-full bg-card">
-                    <span
-                      className="block size-full origin-center"
-                      style={{ transform: "translateY(10.5%) scale(1.35)" }}
-                    >
-                      <AnimeVoiceAvatar
-                        pack={opt.pack}
-                        size={72}
+                  <span className="relative flex size-[4.5rem] items-center justify-center overflow-hidden rounded-full bg-card">
+                    {opt.id === "orb" ? (
+                      <Orb
                         state="idle"
-                        emotion="happy"
-                        mouseTracking={false}
+                        theme="cloud"
+                        size={72}
+                        interactive={false}
+                        aria-label="Orb preview"
                       />
-                    </span>
+                    ) : opt.pack ? (
+                      <span
+                        className="block size-full origin-center"
+                        style={{ transform: "translateY(10.5%) scale(1.35)" }}
+                      >
+                        <AnimeVoiceAvatar
+                          pack={opt.pack}
+                          size={72}
+                          state="idle"
+                          emotion="happy"
+                          mouseTracking={false}
+                        />
+                      </span>
+                    ) : null}
                   </span>
                   <span className="text-sm font-medium">{opt.name}</span>
                 </button>
@@ -171,13 +182,12 @@ export function ProfileView({
             {/* Not available yet: shown, but not clickable. */}
             <div
               aria-disabled="true"
-              // Full-width row on phones (it would be a lonely half-tile), a tile from sm.
-              className="col-span-2 flex flex-row items-center gap-3 rounded-2xl border border-dashed p-3 text-muted-foreground sm:col-span-1 sm:flex-col sm:p-4"
+              className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed p-3 text-muted-foreground sm:p-4"
             >
-              <span className="flex size-12 shrink-0 items-center justify-center rounded-full bg-muted sm:size-[4.5rem]">
+              <span className="flex size-[4.5rem] shrink-0 items-center justify-center rounded-full bg-muted">
                 <PlusIcon className="size-6" />
               </span>
-              <span className="flex flex-col sm:items-center sm:text-center">
+              <span className="flex flex-col items-center text-center">
                 <span className="text-sm font-medium text-foreground">Create your own</span>
                 <span className="text-xs">Coming soon</span>
               </span>

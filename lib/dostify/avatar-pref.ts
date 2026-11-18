@@ -7,7 +7,12 @@ const CHANGE_EVENT = "dostify-avatar-change";
 export function readAvatarPref(): AvatarId {
   try {
     const v = localStorage.getItem(AVATAR_STORAGE_KEY);
-    return v && isValidAvatarId(v) ? v : "sakura";
+    if (v && isValidAvatarId(v)) return v;
+    if (typeof document !== "undefined") {
+      const match = document.cookie.match(new RegExp(`(?:^|; )${AVATAR_STORAGE_KEY}=([^;]*)`));
+      if (match && isValidAvatarId(match[1])) return match[1];
+    }
+    return "sakura";
   } catch {
     return "sakura";
   }
@@ -16,6 +21,9 @@ export function readAvatarPref(): AvatarId {
 export function setAvatarPref(id: AvatarId) {
   try {
     localStorage.setItem(AVATAR_STORAGE_KEY, id);
+    if (typeof document !== "undefined") {
+      document.cookie = `${AVATAR_STORAGE_KEY}=${id}; path=/; max-age=31536000; SameSite=Lax`;
+    }
   } catch {
     // Storage unavailable
   }

@@ -19,7 +19,7 @@ const GlobalVoiceContext = React.createContext<GlobalVoiceContextValue | null>(n
 export function GlobalVoiceProvider({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
-  const { pack } = useAvatarPref();
+  const { pack, avatarId } = useAvatarPref();
 
   const voiceAgentId =
     process.env.NEXT_PUBLIC_PERSONA_VOICE_AGENT_ID || DEFAULT_VOICE_AGENT_ID;
@@ -67,6 +67,7 @@ export function GlobalVoiceProvider({ children }: { children: React.ReactNode })
         <VoiceDock
           voice={voice}
           pack={pack}
+          avatarId={avatarId}
           onExpand={() => router.push("/chat")}
         />
       )}
