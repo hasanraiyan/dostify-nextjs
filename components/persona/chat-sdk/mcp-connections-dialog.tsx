@@ -51,17 +51,26 @@ function formatExpiry(expiresAt: string | null | undefined) {
   return `Expires ${date.toLocaleDateString(undefined, { month: "short", day: "numeric" })}`;
 }
 
-function ConnectorTile({ name }: { name: string }) {
+function ConnectorTile({ name, icon }: { name: string; icon?: string }) {
   const initial = name.trim().charAt(0).toUpperCase() || "?";
+  const [broken, setBroken] = React.useState(false);
   return (
     <span
       aria-hidden="true"
-      className="flex size-8 shrink-0 items-center justify-center border border-border bg-muted/40 text-xs font-semibold text-muted-foreground"
+      className="flex size-8 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-border bg-muted/40 text-xs font-semibold text-muted-foreground"
     >
-      {initial}
+      {icon && !broken ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={icon} alt="" className="size-full object-cover" onError={() => setBroken(true)} />
+      ) : (
+        initial
+      )}
     </span>
   );
 }
+
+/** Optional override of how a connector is shown (friendly name, description, icon). */
+export type ConnectorDisplay = { name: string; description: string; icon?: string };
 
 export interface McpConnectionsListProps {
   connections: PersonaMcpConnection[];
@@ -69,6 +78,8 @@ export interface McpConnectionsListProps {
   onRevoke: (mcpId: string) => Promise<void>;
   justConnectedMcpId?: string | null;
   isLoading?: boolean;
+  /** Customise how each connector is shown; defaults to what Persona sent. */
+  resolveDisplay?: (connection: PersonaMcpConnection) => ConnectorDisplay;
 }
 
 /** One row per user-mode MCP with Connect / Reconnect / Disconnect. Used by the dialog and the Connectors page. */
@@ -78,6 +89,7 @@ export function McpConnectionsList({
   onRevoke,
   justConnectedMcpId,
   isLoading,
+  resolveDisplay,
 }: McpConnectionsListProps) {
   const [revokingId, setRevokingId] = React.useState<string | null>(null);
   const [error, setError] = React.useState<string | null>(null);
@@ -127,6 +139,10 @@ export function McpConnectionsList({
             const revoking = revokingId === connection.mcpId;
             const justConnected = justConnectedMcpId === connection.mcpId;
             const expiry = isConnected ? formatExpiry(connection.expiresAt) : null;
+            const display: ConnectorDisplay = resolveDisplay?.(connection) ?? {
+              name: connection.name,
+              description: connection.description,
+            };
             return (
               <li
                 key={connection.mcpId}
@@ -136,10 +152,10 @@ export function McpConnectionsList({
                 )}
               >
                 <div className="flex min-w-0 items-start gap-3">
-                  <ConnectorTile name={connection.name} />
+                  <ConnectorTile name={display.name} icon={display.icon} />
                   <div className="flex min-w-0 flex-col gap-1">
                     <div className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
-                      <span className="truncate text-sm font-medium">{connection.name}</span>
+                      <span className="truncate text-sm font-medium">{display.name}</span>
                       <span className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
                         <span
                           aria-hidden="true"
@@ -154,9 +170,9 @@ export function McpConnectionsList({
                         )}
                       </span>
                     </div>
-                    {connection.description && (
+                    {display.description && (
                       <span className="line-clamp-2 text-xs text-muted-foreground">
-                        {connection.description}
+                        {display.description}
                       </span>
                     )}
                     {connection.lastError && needsReconnect && (

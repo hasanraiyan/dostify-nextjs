@@ -5,6 +5,7 @@ import { McpConnectionNotice } from "@/components/persona/chat-sdk/mcp-connect-b
 import { McpConnectionsList } from "@/components/persona/chat-sdk/mcp-connections-dialog";
 import { useMcpConnect } from "@/components/persona/chat-sdk/use-mcp-connect";
 import { AGENTS } from "@/app/agents";
+import { resolveConnector } from "@/lib/dostify/connector-meta";
 
 /** How long a success notice stays before clearing itself; failures stay until dismissed. */
 const SUCCESS_NOTICE_MS = 8000;
@@ -67,6 +68,7 @@ export function ConnectorsView() {
           isLoading={isLoading}
           onConnect={connect}
           onRevoke={disconnect}
+          resolveDisplay={resolveConnector}
           justConnectedMcpId={notice?.kind === "success" ? notice.mcpId : undefined}
         />
       </div>
