@@ -1,19 +1,19 @@
 services:
   postgres:
     image: postgres:16-alpine
-    container_name: project-postgres
+    container_name: dostify-postgres
     restart: unless-stopped
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:-project}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-project}
-      POSTGRES_DB: ${POSTGRES_DB:-project}
+      POSTGRES_USER: ${POSTGRES_USER:-dostify}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-dostify}
+      POSTGRES_DB: ${POSTGRES_DB:-dostify}
     ports:
-      - "${POSTGRES_PORT:-5432}:5432"
+      - "${POSTGRES_PORT:-5434}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./db/init:/docker-entrypoint-initdb.d:ro
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-project} -d ${POSTGRES_DB:-project}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-dostify} -d ${POSTGRES_DB:-dostify}"]
       interval: 10s
       timeout: 5s
       retries: 5
