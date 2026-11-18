@@ -133,7 +133,8 @@ export function ProfileView({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-3 gap-3">
+          {/* Two across on phones, three from sm. */}
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
             {AVATAR_OPTIONS.map((opt) => {
               const selected = avatarId === opt.id;
               return (
@@ -144,18 +145,18 @@ export function ProfileView({
                   aria-pressed={selected}
                   disabled={isPending}
                   className={cn(
-                    "flex flex-col items-center gap-3 rounded-2xl border p-4 transition-colors",
+                    "flex flex-col items-center gap-3 rounded-2xl border p-3 transition-colors sm:p-4",
                     selected ? "border-foreground" : "border-border hover:bg-muted",
                   )}
                 >
-                  <span className="relative block size-20 overflow-hidden rounded-full bg-card">
+                  <span className="relative block size-[4.5rem] overflow-hidden rounded-full bg-card">
                     <span
                       className="block size-full origin-center"
                       style={{ transform: "translateY(10.5%) scale(1.35)" }}
                     >
                       <AnimeVoiceAvatar
                         pack={opt.pack}
-                        size={80}
+                        size={72}
                         state="idle"
                         emotion="happy"
                         mouseTracking={false}
@@ -170,12 +171,13 @@ export function ProfileView({
             {/* Not available yet: shown, but not clickable. */}
             <div
               aria-disabled="true"
-              className="flex flex-col items-center gap-3 rounded-2xl border border-dashed p-4 text-muted-foreground"
+              // Full-width row on phones (it would be a lonely half-tile), a tile from sm.
+              className="col-span-2 flex flex-row items-center gap-3 rounded-2xl border border-dashed p-3 text-muted-foreground sm:col-span-1 sm:flex-col sm:p-4"
             >
-              <span className="flex size-20 items-center justify-center rounded-full bg-muted">
+              <span className="flex size-12 shrink-0 items-center justify-center rounded-full bg-muted sm:size-[4.5rem]">
                 <PlusIcon className="size-6" />
               </span>
-              <span className="flex flex-col items-center text-center">
+              <span className="flex flex-col sm:items-center sm:text-center">
                 <span className="text-sm font-medium text-foreground">Create your own</span>
                 <span className="text-xs">Coming soon</span>
               </span>
