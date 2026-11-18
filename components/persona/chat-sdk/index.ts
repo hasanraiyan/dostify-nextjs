@@ -17,5 +17,6 @@ export { MemoryWorkspaceDialog, type MemoryWorkspaceDialogProps } from "./memory
 export { SandboxTerminalDialog, type SandboxTerminalDialogProps } from "./sandbox-terminal-dialog";
 export { VoiceDock } from "./voice-dock";
 export { VoiceFab, type VoiceFabProps } from "./voice-fab";
+export { GlobalVoiceProvider, useGlobalVoice, type GlobalVoiceContextValue } from "./global-voice-context";
 export { AgentPicker, type PersonaAgentOption } from "./agent-picker";
 export { PersonaFrontendTools } from "./frontend-tools";

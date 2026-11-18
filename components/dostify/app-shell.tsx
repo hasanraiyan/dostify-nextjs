@@ -6,7 +6,7 @@ import Link from "next/link";
 import { ListIcon } from "@phosphor-icons/react";
 import { PersonaProvider } from "@personaai/react";
 import { AvatarSlotProvider } from "@/components/persona/avatar";
-import { NewChatIcon } from "@/components/persona/chat-sdk";
+import { GlobalVoiceProvider, NewChatIcon } from "@/components/persona/chat-sdk";
 import { SharedThreadsProvider } from "@/components/persona/chat-sdk/threads-context";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
@@ -72,8 +72,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       logLevel="debug"
     >
       <AvatarSlotProvider>
-        <SharedThreadsProvider>
-          <JournalListProvider>
+        <GlobalVoiceProvider>
+          <SharedThreadsProvider>
+            <JournalListProvider>
           <div className="flex h-dvh w-full">
             <aside className="my-2 ml-2 hidden w-64 shrink-0 overflow-hidden rounded-2xl border bg-card md:block">
               <SidebarContent />
@@ -111,7 +112,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </Sheet>
         </JournalListProvider>
       </SharedThreadsProvider>
-    </AvatarSlotProvider>
-  </PersonaProvider>
+    </GlobalVoiceProvider>
+  </AvatarSlotProvider>
+</PersonaProvider>
   );
 }

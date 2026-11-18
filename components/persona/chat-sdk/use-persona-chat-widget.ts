@@ -10,6 +10,7 @@ import {
   type PersonaStreamingEvent,
   type SendMessageOverride,
 } from "@personaai/react";
+import { useGlobalVoice } from "./global-voice-context";
 import { useSharedThreads, useStalledFlag } from "./threads-context";
 import { groupReasoning } from "./message-grouping";
 
@@ -92,14 +93,17 @@ export function usePersonaChatWidget(options: UsePersonaChatWidgetOptions = {}) 
   // Always called (hooks can't be conditional) — cheap until voice.start()
   // is actually invoked. `enableVoice` only gates whether it's merged into
   // `useChat` and whether `PersonaChatView` renders any voice UI for it.
+  const globalVoiceContext = useGlobalVoice();
   const effectiveVoiceAgentId = voiceAgentId || agentId;
-  const voice = useVoice({
+  const localVoice = useVoice({
     agentId: effectiveVoiceAgentId,
     threadId: activeThreadId,
     agentVersion: voiceAgentVersion,
     environment: voiceEnvironment,
-    autoPrefetch: true,
+    autoPrefetch: !globalVoiceContext,
   });
+
+  const voice = globalVoiceContext?.voice ?? localVoice;
 
   const setActiveThread = useCallback(
     (id: string | undefined) => {
