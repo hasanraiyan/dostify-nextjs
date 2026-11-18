@@ -19,15 +19,34 @@ Backed by Prisma. All tools scope data to the Clerk user from `authInfo.extra.us
 |---|---|
 | `create_task` / `list_tasks` / `update_task` / `complete_task` / `delete_task` | Planner (title, notes, due date, category, priority) |
 | `start_focus_session` / `end_focus_session` / `focus_stats` | Pomodoro (planned minutes, optional task link) |
-| `add_journal_entry` / `list_journal_entries` / `mood_summary` | Mood journal and trends |
+| `add_journal_entry` / `list_journal_entries` | Mood journal |
 | `set_reminder` / `list_reminders` / `cancel_reminder` | In-app reminders |
 | `get_profile` | Level, XP, streak |
-| `get_today_overview` | One call: today's tasks, reminders, focus minutes, last mood (great for "mera din kaisa hai") |
+| `get_today_overview` | One call: today's tasks, reminders, focus minutes, last journal entry (great for "mera din kaisa hai") |
 
 Notes:
 - Award XP inside the tools (complete task, finish focus session, journal entry) so the agent never calculates it.
 - `delete_*` tools should be marked as needing approval (the starter has an `interrupt-panel` for approvals).
 - Optional: MCP **app widgets** (the starter has `mcp-app-renderer`) to render a task list or timer card inside chat.
+
+## 1b. Frontend tools (run in the browser, turn on "Frontend Tools" on the agent)
+Registered in `components/persona/chat-sdk/frontend-tools.tsx`. Arguments from the model are untrusted: navigation uses a fixed allowlist, data comes from MCP tools.
+
+**Keep (already in starter):** `get_page_context`, `set_theme`, `navigate_to` (allowlist to be changed to Dostify pages), `copy_to_clipboard`, `confirm_action`.
+
+**Build for v1:**
+| Tool | What it shows |
+|---|---|
+| `show_helpline` | **Crisis card**: Tele-MANAS 14416 / 1-800-891-4416, KIRAN 1800-599-0019, iCall 9152987821, 112, with tap-to-call links. Called by the agent whenever the user mentions suicide or self-harm (see `AGENT.md`). |
+| `start_focus_timer` | Live Pomodoro card (work/break, pause), calls `end_focus_session` when done |
+| `show_tasks` | Today's tasks as a tickable card |
+| `breathing_exercise` | 4-7-8 breathing animation for stress |
+
+**Later:** `show_flashcards`, `play_focus_sound`, `show_study_plan`, `request_notification`.
+
+**Removed from plan:** `mood_check_in`, `show_mood_chart`, mood trends. Also drop the starter's `get_weather` and `show_clock`.
+
+Helpline numbers: double check them before launch, they can change.
 
 ## 2. Suggested connectors (user-mode, OAuth)
 Chosen for Dostify's audience (students and young professionals). Ordered by value.

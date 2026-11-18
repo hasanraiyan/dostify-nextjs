@@ -36,7 +36,7 @@ Tagline (proposed): *"Tera dost, jo kaam bhi karta hai."*
 Implemented as MCP tools in `app/[transport]/route.ts` backed by Prisma:
 1. **Tasks**: `create_task`, `list_tasks`, `complete_task`, `update_task` (date, category, priority).
 2. **Pomodoro**: `start_focus_session`, `end_focus_session` (+ stats).
-3. **Mood journal**: `add_journal_entry`, `list_journal_entries`, `mood_summary`.
+3. **Mood journal**: `add_journal_entry`, `list_journal_entries`.
 4. **Reminders**: `set_reminder`, shown in-app (no WhatsApp/SMS).
 5. **Profile / gamification**: `get_profile` (level, XP, streak).
 6. **Web search / study help**: use Persona's built-in tools (search, citations).
