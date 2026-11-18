@@ -8,7 +8,8 @@ import type { UsageSummary } from "@/lib/dostify/usage";
 function formatVoice(seconds: number) {
   const h = Math.floor(seconds / 3600);
   const m = Math.floor((seconds % 3600) / 60);
-  return h > 0 ? `${h}h ${m}m` : `${m}m`;
+  if (h === 0) return `${m}m`;
+  return m === 0 ? `${h}h` : `${h}h ${m}m`;
 }
 
 function Meter({ label, used, limit, text }: { label: string; used: number; limit: number; text: string }) {

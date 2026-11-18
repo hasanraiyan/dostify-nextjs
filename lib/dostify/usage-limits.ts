@@ -3,7 +3,7 @@
  * Voice is counted in seconds.
  */
 export const FREE_MONTHLY_MESSAGES = 50;
-export const FREE_MONTHLY_VOICE_SECONDS = 30 * 60 * 60; // 30 hours
+export const FREE_MONTHLY_VOICE_SECONDS = 30 * 60; // 30 minutes
 
 /** A call reported as still open counts for at most this long (Persona caps a call at 15 min). */
 export const MAX_CALL_SECONDS = 15 * 60;
