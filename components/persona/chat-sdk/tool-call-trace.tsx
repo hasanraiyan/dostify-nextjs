@@ -34,6 +34,12 @@ function logToolCall(tc: PersonaToolCall) {
   }
 }
 
+// Background / animation tools that should never render in the chat transcript.
+const HIDDEN_TOOL_NAMES = new Set([
+  "set_avatar_emotion",
+  "trigger_avatar_reaction",
+]);
+
 function ToolCallTrace({
   toolCalls,
   todos,
@@ -75,6 +81,9 @@ function ToolCallTrace({
   };
 
   for (const tc of toolCalls) {
+    if (HIDDEN_TOOL_NAMES.has(tc.toolName)) {
+      continue;
+    }
     logToolCall(tc);
     groupKey ??= tc.toolCallId;
     // A renderer registered with the SDK wins; then our own cards; else null.
@@ -113,6 +122,8 @@ function ToolCallTrace({
     }
   }
   flushGroup();
+
+  if (elements.length === 0) return null;
 
   return <div className="flex flex-col gap-1.5">{elements}</div>;
 }

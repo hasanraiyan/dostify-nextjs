@@ -4,7 +4,7 @@ import * as React from "react";
 import { useRouter } from "next/navigation";
 import { Bar, BarChart, CartesianGrid, Line, LineChart, XAxis, YAxis } from "recharts";
 import { CheckCircleIcon, XCircleIcon } from "@phosphor-icons/react";
-import { useComponent, useFrontendTool, useHumanInTheLoop } from "@personaai/react";
+import { useComponent, useFrontendTool, useHumanInTheLoop, useRenderTool } from "@personaai/react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -376,6 +376,17 @@ export function PersonaFrontendTools() {
 
   const effectiveAvatar = slottedAvatar ?? fallbackAvatarRef.current;
   useAvatarTools(effectiveAvatar);
+
+  // Silence avatar tool call cards in the chat UI so gestures and emotions
+  // execute visually on the avatar without cluttering the chat transcript.
+  useRenderTool({
+    name: "set_avatar_emotion",
+    render: () => null,
+  });
+  useRenderTool({
+    name: "trigger_avatar_reaction",
+    render: () => null,
+  });
 
   return null;
 }
