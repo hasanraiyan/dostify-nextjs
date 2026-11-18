@@ -31,7 +31,7 @@ export const CONNECTORS: ConnectorMeta[] = [
     match: ['pyqdeck_mcp'],
     name: 'PYQDeck',
     description: 'Previous year question papers and study material.',
-    icon: '/connectors/pyqdeck.svg', // placeholder, replace with the real logo
+    icon: '/connectors/pyqdeck.png',
   },
 ]
 
