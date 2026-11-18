@@ -205,6 +205,8 @@ export interface PersonaChatViewProps extends UsePersonaChatWidgetOptions {
   showTerminal?: boolean;
   /** Extra controls appended to the main header's right-side action group. */
   headerActions?: React.ReactNode;
+  /** Extra controls at the start of the main header (e.g. an app menu button). */
+  headerLeading?: React.ReactNode;
   /**
    * CSS custom properties that override this app's shadcn tokens for just
    * this view (`--primary`, `--radius`, `--background`, …) — every visual
@@ -297,6 +299,7 @@ export function PersonaChatView({
   showFiles = true,
   showTerminal = true,
   headerActions,
+  headerLeading,
   theme,
   classNames = {},
   components = {},
@@ -644,6 +647,7 @@ export function PersonaChatView({
 
       <div className="flex min-h-0 min-w-0 flex-1 flex-col">
         <div className="flex h-11 shrink-0 items-center gap-1 border-b border-border px-2">
+          {headerLeading}
           {showThreads && threadListOverlay && (
             <Button
               type="button"

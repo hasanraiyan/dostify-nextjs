@@ -90,69 +90,117 @@ export function ConnectorsView() {
     "not-connected": unconnected.length,
   };
 
+  const [searchOpen, setSearchOpen] = React.useState(false);
+  const searchRef = React.useRef<HTMLInputElement>(null);
+  const openSearch = () => {
+    setSearchOpen(true);
+    // Wait for the field to mount, then focus it (opens the keyboard on phones).
+    requestAnimationFrame(() => searchRef.current?.focus());
+  };
+  const closeSearch = () => {
+    setSearchOpen(false);
+    setQuery("");
+  };
+
+  /* iOS-style search field: soft fill, no border. */
+  const searchField = (
+    <div className="relative min-w-0 flex-1">
+      <MagnifyingGlassIcon className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground" />
+      <input
+        ref={searchRef}
+        type="search"
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        placeholder="Search"
+        aria-label="Search connectors"
+        className="h-9 w-full rounded-[10px] bg-muted/70 pr-8 pl-8 text-base outline-none transition-shadow placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-primary/40 sm:text-[15px] [&::-webkit-search-cancel-button]:hidden"
+      />
+      {query && (
+        <button
+          type="button"
+          aria-label="Clear search"
+          onClick={() => setQuery("")}
+          className="absolute top-1/2 right-2 flex size-5 -translate-y-1/2 items-center justify-center rounded-full bg-muted-foreground/40 text-background"
+        >
+          <XIcon weight="bold" className="size-3" />
+        </button>
+      )}
+    </div>
+  );
+
+  const hasConnectors = connections.length > 0;
+
   return (
-    <div className="flex w-full flex-col gap-5">
+    <div className="flex w-full flex-col gap-4 pb-12">
       <header className="flex flex-col gap-1">
-        <h1 className="font-heading text-2xl font-semibold sm:text-3xl">Connectors</h1>
-        <p className="text-sm text-muted-foreground">
+        {/* Mobile: the title row swaps to the search field (icon first, like iOS / ChatGPT). */}
+        <div className="flex h-11 items-center gap-2">
+          {searchOpen ? (
+            <>
+              {searchField}
+              <button
+                type="button"
+                onClick={closeSearch}
+                className="shrink-0 px-1 text-[17px] text-primary active:opacity-60"
+              >
+                Cancel
+              </button>
+            </>
+          ) : (
+            <>
+              <h1 className="font-heading text-[28px] leading-none font-bold tracking-tight sm:text-[34px]">
+                Connectors
+              </h1>
+              {hasConnectors && (
+                <button
+                  type="button"
+                  aria-label="Search connectors"
+                  onClick={openSearch}
+                  className="ml-auto flex size-9 md:hidden items-center justify-center rounded-full bg-muted/70 text-foreground active:scale-95"
+                >
+                  <MagnifyingGlassIcon className="size-[18px]" />
+                </button>
+              )}
+              {/* Desktop keeps the field in view the whole time. */}
+              {hasConnectors && <div className="ml-auto hidden w-64 md:flex">{searchField}</div>}
+            </>
+          )}
+        </div>
+        <p className="text-[15px] text-muted-foreground">
           Connect your accounts so Dostify can use them for you.
-          {connections.length > 0 && (
+          {hasConnectors && (
             <span className="whitespace-nowrap"> {connected} of {connections.length} connected.</span>
           )}
         </p>
       </header>
 
-      {connections.length > 0 && (
-        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-          <div className="relative w-full lg:max-w-sm">
-            <MagnifyingGlassIcon className="pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-muted-foreground" />
-            <input
-              type="search"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search connectors"
-              aria-label="Search connectors"
-              className="h-10 w-full rounded-full border border-input bg-transparent pr-9 pl-10 text-base outline-none transition-colors placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 sm:text-sm"
-            />
-            {query && (
+      {hasConnectors && (
+        /* iOS segmented control: a soft track with a raised selected segment. */
+        <div
+          role="radiogroup"
+          aria-label="Filter connectors"
+          className="grid grid-cols-3 rounded-[10px] bg-muted/70 p-0.5 sm:inline-grid sm:self-start"
+        >
+          {FILTERS.map(({ value, label }) => {
+            const active = filter === value;
+            return (
               <button
+                key={value}
                 type="button"
-                aria-label="Clear search"
-                onClick={() => setQuery("")}
-                className="absolute top-1/2 right-2 flex size-7 -translate-y-1/2 items-center justify-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground"
+                role="radio"
+                aria-checked={active}
+                onClick={() => setFilter(value)}
+                className={cn(
+                  "h-8 rounded-[8px] px-3 text-[13px] font-medium whitespace-nowrap transition-all sm:px-5",
+                  active
+                    ? "bg-background text-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground",
+                )}
               >
-                <XIcon className="size-4" />
+                {label} <span className="tabular-nums opacity-60">{counts[value]}</span>
               </button>
-            )}
-          </div>
-
-          {/* One row that scrolls sideways on narrow screens instead of wrapping. */}
-          <div
-            role="radiogroup"
-            aria-label="Filter connectors"
-            className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 sm:mx-0 sm:px-0 sm:pb-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-          >
-            {FILTERS.map(({ value, label }) => {
-              const active = filter === value;
-              return (
-                <button
-                  key={value}
-                  type="button"
-                  role="radio"
-                  aria-checked={active}
-                  onClick={() => setFilter(value)}
-                  className={cn(
-                    "h-9 shrink-0 rounded-full border px-4 text-sm font-medium whitespace-nowrap transition-colors",
-                    active
-                      ? "border-primary bg-primary/10 text-foreground"
-                      : "text-muted-foreground hover:bg-muted hover:text-foreground",
-                  )}
-                >
-                  {label} <span className="tabular-nums opacity-70">{counts[value]}</span>
-                </button>
-              );
-            })}
-          </div>
+            );
+          })}
         </div>
       )}
 

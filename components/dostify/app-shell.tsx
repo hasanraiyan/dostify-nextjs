@@ -16,17 +16,32 @@ import { ChatPanel } from "./chat-panel";
 import { JournalListProvider } from "./journal-list-context";
 import { JournalPanel } from "./journal-panel";
 
+const AppMenuContext = React.createContext<{ openMenu: () => void } | null>(null);
+
+/** Lets a page put the mobile menu button in its own header. */
+export function useAppMenu() {
+  return React.useContext(AppMenuContext);
+}
+
+/** What the header's "+" button creates, based on the open page (null elsewhere). */
+function useCreateAction() {
+  const pathname = usePathname();
+  const inChat = pathname === "/chat" || pathname.startsWith("/chat/");
+  const inJournal = pathname.startsWith("/journal");
+  return inChat
+    ? { href: "/chat", label: "New chat" }
+    : inJournal
+      ? { href: "/journal/new", label: "New entry" }
+      : null;
+}
+
 /** The one sidebar: nav on top, the current section's list below, account at the bottom. */
 function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname();
   const inChat = pathname === "/chat" || pathname.startsWith("/chat/");
   const inJournal = pathname.startsWith("/journal");
   // The header button creates whatever the open page is about.
-  const action = inChat
-    ? { href: "/chat", label: "New chat" }
-    : inJournal
-      ? { href: "/journal/new", label: "New entry" }
-      : null;
+  const action = useCreateAction();
 
   return (
     <div className="flex h-full min-h-0 flex-col">
@@ -64,6 +79,11 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
  */
 export function AppShell({ children }: { children: React.ReactNode }) {
   const [menuOpen, setMenuOpen] = React.useState(false);
+  const createAction = useCreateAction();
+  const pathname = usePathname();
+  // The chat view has its own header row; it carries the menu and "+" there.
+  const chatOwnsHeader = pathname === "/chat" || pathname.startsWith("/chat/");
+  const menuValue = React.useMemo(() => ({ openMenu: () => setMenuOpen(true) }), []);
 
   return (
     <PersonaProvider
@@ -81,7 +101,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             </aside>
 
             <div className="flex min-w-0 flex-1 flex-col">
-              <header className="flex shrink-0 items-center gap-2 border-b p-2 md:hidden">
+              <header
+                className={`shrink-0 items-center gap-2 border-b p-2 ${chatOwnsHeader ? "hidden" : "flex md:hidden"}`}
+              >
                 <Button
                   type="button"
                   variant="ghost"
@@ -93,8 +115,20 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                   <ListIcon className="size-4" />
                 </Button>
                 <span className="font-heading text-base font-semibold">Dostify</span>
+                {createAction && (
+                  <Link
+                    href={createAction.href}
+                    aria-label={createAction.label}
+                    title={createAction.label}
+                    className="ml-auto flex size-8 items-center justify-center rounded-full bg-primary text-primary-foreground transition-opacity hover:opacity-90"
+                  >
+                    <NewChatIcon className="size-4" />
+                  </Link>
+                )}
               </header>
-              <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">{children}</div>
+              <AppMenuContext.Provider value={menuValue}>
+                <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">{children}</div>
+              </AppMenuContext.Provider>
             </div>
           </div>
 

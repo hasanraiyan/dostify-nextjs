@@ -6,7 +6,11 @@ import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { cn } from "@/lib/utils";
 import type { PersonaMcpConnection } from "@personaai/react";
-import { ConnectButton, ConnectorTile, type ConnectorDisplay } from "./connector-ui";
+import {
+  ConnectButton,
+  ConnectorTile,
+  type ConnectorDisplay,
+} from "./connector-ui";
 
 export type { ConnectorDisplay };
 
@@ -28,7 +32,9 @@ const STATUS_DOTS: Record<McpStatus, string> = {
 
 /** Backends predating `status` only send the boolean — derive the finer state. */
 function statusOf(connection: PersonaMcpConnection): McpStatus {
-  return connection.status ?? (connection.connected ? "connected" : "not_connected");
+  return (
+    connection.status ?? (connection.connected ? "connected" : "not_connected")
+  );
 }
 
 /** Short, locale-aware "expires" hint for connectors with a token lifetime. */
@@ -39,8 +45,12 @@ function formatExpiry(expiresAt: string | null | undefined) {
   return `Expires ${date.toLocaleDateString(undefined, { month: "short", day: "numeric" })}`;
 }
 
-/** 1 column on phones, 2 from `sm`, 3 from `xl`, 4 from `2xl`. */
-const GRID = "grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4";
+/**
+ * Phones: iOS "inset grouped" list (one rounded card, rows split by hairlines).
+ * From `md`: a card grid (2 columns, 3 from `xl`, 4 from `2xl`).
+ */
+const GROUP =
+  "divide-y divide-border/70 overflow-hidden rounded-2xl border bg-card md:grid md:grid-cols-2 md:gap-3 md:divide-y-0 md:overflow-visible md:rounded-none md:border-0 md:bg-transparent xl:grid-cols-3 2xl:grid-cols-4";
 
 export interface McpConnectionsListProps {
   connections: PersonaMcpConnection[];
@@ -75,26 +85,32 @@ export function McpConnectionsList({
       try {
         await onRevoke(mcpId);
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Failed to revoke access.");
+        setError(
+          err instanceof Error ? err.message : "Failed to revoke access.",
+        );
       } finally {
         setRevokingId(null);
       }
     },
-    [onRevoke]
+    [onRevoke],
   );
 
   if (isLoading && connections.length === 0) {
     return (
-      <div className={GRID} aria-busy="true" role="status" aria-label="Loading connectors">
+      <div
+        className={GROUP}
+        aria-busy="true"
+        role="status"
+        aria-label="Loading connectors"
+      >
         {[0, 1, 2].map((i) => (
-          <div key={i} className="flex flex-col gap-3 rounded-2xl border bg-card p-4">
-            <div className="flex items-center gap-3">
-              <span className="skeleton-shimmer size-11 shrink-0 rounded-xl bg-muted" />
+          <div key={i} className="flex items-center gap-3 px-4 py-3">
+            <span className="skeleton-shimmer size-12 shrink-0 rounded-[11px] bg-muted" />
+            <div className="flex flex-1 flex-col gap-2">
               <span className="skeleton-shimmer h-4 w-28 rounded-md bg-muted" />
+              <span className="skeleton-shimmer h-3 w-44 max-w-full rounded-md bg-muted" />
             </div>
-            <span className="skeleton-shimmer h-3 w-full rounded-md bg-muted" />
-            <span className="skeleton-shimmer h-3 w-2/3 rounded-md bg-muted" />
-            <span className="skeleton-shimmer mt-1 h-10 w-full rounded-full bg-muted sm:h-9" />
+            <span className="skeleton-shimmer h-8 w-20 rounded-full bg-muted" />
           </div>
         ))}
       </div>
@@ -105,21 +121,26 @@ export function McpConnectionsList({
     return (
       <div className="flex flex-col items-center gap-2 rounded-2xl border border-dashed px-4 py-10 text-center">
         <PlugsIcon className="size-7 text-muted-foreground" />
-        <p className="text-sm text-muted-foreground">No connectors are attached to this assistant.</p>
+        <p className="text-sm text-muted-foreground">
+          No connectors are attached to this assistant.
+        </p>
       </div>
     );
   }
 
   return (
     <>
-      <ul className={GRID}>
+      <ul className={GROUP}>
         {connections.map((connection) => {
           const status = statusOf(connection);
           const isConnected = status === "connected";
-          const needsReconnect = status === "needs_auth" || status === "expired";
+          const needsReconnect =
+            status === "needs_auth" || status === "expired";
           const revoking = revokingId === connection.mcpId;
           const justConnected = justConnectedMcpId === connection.mcpId;
-          const expiry = isConnected ? formatExpiry(connection.expiresAt) : null;
+          const expiry = isConnected
+            ? formatExpiry(connection.expiresAt)
+            : null;
           const display: ConnectorDisplay = resolveDisplay?.(connection) ?? {
             name: connection.name,
             description: connection.description,
@@ -128,20 +149,37 @@ export function McpConnectionsList({
             <li
               key={connection.mcpId}
               className={cn(
-                "flex min-w-0 flex-col gap-3 rounded-2xl border bg-card p-4 transition-colors",
-                justConnected && "border-emerald-500/40 bg-emerald-500/5"
+                "flex min-w-0 items-center gap-3 px-4 py-3 transition-colors md:flex-col md:items-stretch md:rounded-2xl md:border md:bg-card md:p-4",
+                justConnected && "bg-emerald-500/5",
               )}
             >
-              <div className="flex items-center gap-3">
-                <ConnectorTile name={display.name} icon={display.icon} className="size-11 rounded-xl text-sm" />
+              <div className="flex min-w-0 flex-1 items-center gap-3 md:items-start">
+                <ConnectorTile
+                  name={display.name}
+                  icon={display.icon}
+                  className="size-12 shrink-0 rounded-[11px] text-sm"
+                />
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-[15px] leading-tight font-semibold">{display.name}</p>
-                  <p className="mt-1 flex items-center gap-1.5 text-xs text-muted-foreground">
+                  <p className="truncate text-[17px] leading-snug font-medium tracking-[-0.01em]">
+                    {display.name}
+                  </p>
+                  {display.description && (
+                    <p className="line-clamp-1 text-[13px] leading-snug text-muted-foreground md:line-clamp-3">
+                      {display.description}
+                    </p>
+                  )}
+                  <p className="mt-0.5 flex items-center gap-1.5 text-xs text-muted-foreground">
                     <span
                       aria-hidden="true"
-                      className={cn("size-1.5 shrink-0 rounded-full", STATUS_DOTS[status])}
+                      className={cn(
+                        "size-1.5 shrink-0 rounded-full",
+                        STATUS_DOTS[status],
+                      )}
                     />
-                    <span className="truncate">{STATUS_LABELS[status]}</span>
+                    <span className="truncate">
+                      {STATUS_LABELS[status]}
+                      {expiry ? ` · ${expiry}` : ""}
+                    </span>
                     {justConnected && (
                       <span className="flex shrink-0 items-center gap-1 text-emerald-600 dark:text-emerald-400">
                         <CheckCircleIcon weight="fill" className="size-3" />
@@ -149,25 +187,19 @@ export function McpConnectionsList({
                       </span>
                     )}
                   </p>
+                  {connection.lastError && needsReconnect && (
+                    <p className="mt-0.5 line-clamp-2 text-xs text-destructive">
+                      {connection.lastError}
+                    </p>
+                  )}
                 </div>
-              </div>
-
-              {/* flex-1 keeps the button at the card's bottom edge across a row. */}
-              <div className="flex flex-1 flex-col gap-1">
-                {display.description && (
-                  <p className="line-clamp-3 text-sm text-muted-foreground">{display.description}</p>
-                )}
-                {connection.lastError && needsReconnect && (
-                  <p className="text-xs text-destructive">{connection.lastError}</p>
-                )}
-                {expiry && <p className="text-xs text-muted-foreground">{expiry}</p>}
               </div>
 
               {isConnected ? (
                 <Button
                   type="button"
-                  variant="outline"
-                  className="h-10 w-full rounded-full text-muted-foreground hover:border-destructive/40 hover:bg-destructive/10 hover:text-destructive sm:h-9"
+                  variant="ghost"
+                  className="h-8 shrink-0 rounded-full bg-muted px-4 text-[13px] md:h-9 md:w-full font-semibold text-destructive hover:bg-destructive/10 hover:text-destructive"
                   disabled={revoking || revokingId !== null}
                   onClick={() => void handleRevoke(connection.mcpId)}
                 >
@@ -178,7 +210,7 @@ export function McpConnectionsList({
                 <ConnectButton
                   connection={connection}
                   onConnect={onConnect}
-                  className="h-10 w-full sm:h-9"
+                  className="shrink-0 bg-primary/10 text-[13px] md:h-9 md:w-full font-semibold text-primary shadow-none hover:bg-primary/20"
                 />
               )}
             </li>

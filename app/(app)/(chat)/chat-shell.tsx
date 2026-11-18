@@ -1,8 +1,13 @@
 "use client";
 
 import * as React from "react";
+import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { ListIcon } from "@phosphor-icons/react";
+import { useAppMenu } from "@/components/dostify/app-shell";
+import { Button } from "@/components/ui/button";
 import {
+  NewChatIcon,
   PersonaChatView,
   PersonaFrontendTools,
 } from "@/components/persona/chat-sdk";
@@ -17,6 +22,7 @@ import { AGENTS, DEFAULT_VOICE_AGENT_ID } from "@/app/agents";
 export function ChatShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
+  const appMenu = useAppMenu();
 
   const threadId = React.useMemo(
     () => /^\/chat\/([^/]+)\/?$/.exec(pathname)?.[1],
@@ -58,6 +64,28 @@ export function ChatShell({ children }: { children: React.ReactNode }) {
           onThreadChange={handleThreadChange}
           title="Dostify"
           showThreadList={false}
+          headerLeading={
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon-sm"
+              className="rounded-full md:hidden"
+              aria-label="Open menu"
+              onClick={() => appMenu?.openMenu()}
+            >
+              <ListIcon />
+            </Button>
+          }
+          headerActions={
+            <Link
+              href="/chat"
+              aria-label="New chat"
+              title="New chat"
+              className="flex size-7 items-center justify-center rounded-full bg-primary text-primary-foreground transition-opacity hover:opacity-90 md:hidden"
+            >
+              <NewChatIcon className="size-4" />
+            </Link>
+          }
         />
       </div>
       {children}
