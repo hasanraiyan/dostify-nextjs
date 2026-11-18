@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { ArrowsClockwiseIcon, CheckCircleIcon, KeyIcon, PlugsIcon } from "@phosphor-icons/react";
+import { CheckCircleIcon, KeyIcon, PlugsIcon } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -21,6 +21,9 @@ import { Spinner } from "@/components/ui/spinner";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
 import type { PersonaMcpConnection } from "@personaai/react";
+import { ConnectButton, ConnectorTile, type ConnectorDisplay } from "./connector-ui";
+
+export type { ConnectorDisplay };
 
 type McpStatus = NonNullable<PersonaMcpConnection["status"]>;
 
@@ -51,27 +54,6 @@ function formatExpiry(expiresAt: string | null | undefined) {
   return `Expires ${date.toLocaleDateString(undefined, { month: "short", day: "numeric" })}`;
 }
 
-function ConnectorTile({ name, icon }: { name: string; icon?: string }) {
-  const initial = name.trim().charAt(0).toUpperCase() || "?";
-  const [broken, setBroken] = React.useState(false);
-  return (
-    <span
-      aria-hidden="true"
-      className="flex size-8 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-border bg-muted/40 text-xs font-semibold text-muted-foreground"
-    >
-      {icon && !broken ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img src={icon} alt="" className="size-full object-cover" onError={() => setBroken(true)} />
-      ) : (
-        initial
-      )}
-    </span>
-  );
-}
-
-/** Optional override of how a connector is shown (friendly name, description, icon). */
-export type ConnectorDisplay = { name: string; description: string; icon?: string };
-
 export interface McpConnectionsListProps {
   connections: PersonaMcpConnection[];
   onConnect: (connection: PersonaMcpConnection) => void;
@@ -92,17 +74,6 @@ export function McpConnectionsList({
   resolveDisplay,
 }: McpConnectionsListProps) {
   const [revokingId, setRevokingId] = React.useState<string | null>(null);
-  // Connecting is a full-page redirect, so show progress until the browser leaves.
-  const [connectingId, setConnectingId] = React.useState<string | null>(null);
-  // Coming back with the Back button restores this page from the browser's
-  // cache, "Connecting…" included, so clear it then.
-  React.useEffect(() => {
-    const reset = (e: PageTransitionEvent) => {
-      if (e.persisted) setConnectingId(null);
-    };
-    window.addEventListener("pageshow", reset);
-    return () => window.removeEventListener("pageshow", reset);
-  }, []);
   const [error, setError] = React.useState<string | null>(null);
 
   const handleRevoke = React.useCallback(
@@ -207,28 +178,7 @@ export function McpConnectionsList({
                       Disconnect
                     </Button>
                   ) : (
-                    <Button
-                      type="button"
-                      className="h-8 rounded-full px-4"
-                      disabled={!connection.authorizeUrl || connectingId !== null}
-                      onClick={() => {
-                        setConnectingId(connection.mcpId);
-                        onConnect(connection);
-                      }}
-                    >
-                      {connectingId === connection.mcpId ? (
-                        <Spinner className="size-3.5" />
-                      ) : needsReconnect ? (
-                        <ArrowsClockwiseIcon />
-                      ) : (
-                        <PlugsIcon />
-                      )}
-                      {connectingId === connection.mcpId
-                        ? "Connecting…"
-                        : needsReconnect
-                          ? "Reconnect"
-                          : "Connect"}
-                    </Button>
+                    <ConnectButton connection={connection} onConnect={onConnect} />
                   )}
                 </div>
               </li>
@@ -253,6 +203,8 @@ export interface McpConnectionsDialogProps {
   /** The connector just confirmed by the OAuth callback — highlighted once. */
   justConnectedMcpId?: string | null;
   isLoading?: boolean;
+  /** Friendly name / icon for a connector; defaults to Persona's raw data. */
+  resolveDisplay?: (connection: PersonaMcpConnection) => ConnectorDisplay;
 }
 
 /**
@@ -270,6 +222,7 @@ export function McpConnectionsDialog({
   onRevoke,
   justConnectedMcpId,
   isLoading,
+  resolveDisplay,
 }: McpConnectionsDialogProps) {
   const isMobile = useIsMobile();
   const connectedCount = connections.filter((c) => statusOf(c) === "connected").length;
@@ -280,6 +233,7 @@ export function McpConnectionsDialog({
       onRevoke={onRevoke}
       justConnectedMcpId={justConnectedMcpId}
       isLoading={isLoading}
+      resolveDisplay={resolveDisplay}
     />
   );
 

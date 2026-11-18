@@ -24,6 +24,7 @@ import { ThreadListBody } from "./thread-list";
 import { Spinner } from "@/components/ui/spinner";
 import { InterruptPanel } from "./interrupt-panel";
 import { McpConnectBanner, McpConnectionNotice } from "./mcp-connect-banner";
+import type { ConnectorDisplay } from "./connector-ui";
 import { McpConnectionsDialog } from "./mcp-connections-dialog";
 import { TodoChecklist } from "./todo-checklist";
 import { SubagentSheet } from "./subagent-sheet";
@@ -38,6 +39,7 @@ import {
 } from "./mcp-app-embed-context";
 import {
   useRenderToolCall,
+  type PersonaMcpConnection,
   type PersonaMessage,
   type PersonaStreamingEvent,
   type PersonaTodo,
@@ -180,6 +182,10 @@ export interface PersonaChatViewProps extends UsePersonaChatWidgetOptions {
   /** Initial collapsed state when `threadListCollapsed` isn't supplied. @default false */
   defaultThreadListCollapsed?: boolean;
   onThreadListCollapsedChange?: (collapsed: boolean) => void;
+  /** Friendly name / icon for connectors, used by the connect banner. */
+  resolveConnectorDisplay?: (connection: PersonaMcpConnection) => ConnectorDisplay;
+  /** Where the connect banner's "Manage" link goes (e.g. a connectors page). */
+  connectorsHref?: string;
   /** Pinned below the thread rows — e.g. the signed-in account's avatar. */
   threadListFooter?: React.ReactNode;
   /** @default true */
@@ -254,6 +260,8 @@ export function PersonaChatView({
   defaultThreadListCollapsed = false,
   onThreadListCollapsedChange,
   threadListFooter,
+  resolveConnectorDisplay,
+  connectorsHref,
   showComposer = true,
   showVoice = true,
   showFiles = true,
@@ -749,6 +757,8 @@ export function PersonaChatView({
               connections={unconnectedMcps}
               blockedMcpIds={authBlockedMcpIds}
               onConnect={connectMcp}
+              resolveDisplay={resolveConnectorDisplay}
+              manageHref={connectorsHref}
             />
           </div>
         )}
@@ -829,6 +839,7 @@ export function PersonaChatView({
             mcpNotice?.kind === "success" ? mcpNotice.mcpId : undefined
           }
           isLoading={isLoadingMcpConnections}
+          resolveDisplay={resolveConnectorDisplay}
         />
       )}
       </div>
