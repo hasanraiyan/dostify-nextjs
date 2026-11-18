@@ -149,6 +149,16 @@ export interface PersonaChatViewComponents {
   }>;
 }
 
+const VOICE_STATE_RING: Record<string, string> = {
+  idle: "ring-foreground/20",
+  connecting: "ring-foreground/40 animate-pulse",
+  thinking: "ring-foreground/60 animate-pulse",
+  listening: "ring-foreground/40",
+  speaking: "ring-foreground",
+  ended: "ring-foreground/20",
+  error: "ring-destructive/60",
+};
+
 export interface PersonaChatViewProps extends UsePersonaChatWidgetOptions {
   title?: string;
   /**
@@ -731,14 +741,29 @@ export function PersonaChatView({
                 "start voice" control lives inside the composer's own send
                 slot below, not as a separate row. */}
             {showVoice && isVoiceActive && (
-              <div className="mb-3 flex flex-col items-center justify-center gap-2.5">
+              <div className="mb-3 flex flex-col items-center justify-center gap-3">
                 <div className="relative flex flex-col items-center justify-center">
-                  <VoiceIndicator
-                    state={voice.state}
-                    voice={voice}
-                    size={290}
-                    variant="avatar"
-                  />
+                  {/* Circular Avatar Container with perspective scaling to prevent cut-off shoulders */}
+                  <div
+                    className={cn(
+                      "relative flex size-44 sm:size-52 items-center justify-center overflow-hidden rounded-full bg-card shadow-2xl ring-4 transition-all duration-300",
+                      voice.isMuted
+                        ? "ring-destructive/60"
+                        : (VOICE_STATE_RING[voice.state] ?? "ring-foreground/20"),
+                    )}
+                  >
+                    <div
+                      className="size-full origin-center"
+                      style={{ transform: "translateY(10.5%) scale(1.35)" }}
+                    >
+                      <VoiceIndicator
+                        state={voice.state}
+                        voice={voice}
+                        size={208}
+                        variant="avatar"
+                      />
+                    </div>
+                  </div>
                   <div className="mt-3 flex items-center justify-center gap-3">
                     <button
                       type="button"
