@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { ListIcon } from "@phosphor-icons/react";
 import { PersonaProvider } from "@personaai/react";
+import { AvatarSlotProvider } from "@/components/persona/avatar";
 import { NewChatIcon } from "@/components/persona/chat-sdk";
 import { SharedThreadsProvider } from "@/components/persona/chat-sdk/threads-context";
 import { Button } from "@/components/ui/button";
@@ -70,8 +71,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       defaultAgentId={process.env.NEXT_PUBLIC_PERSONA_AGENT_ID}
       logLevel="debug"
     >
-      <SharedThreadsProvider>
-        <JournalListProvider>
+      <AvatarSlotProvider>
+        <SharedThreadsProvider>
+          <JournalListProvider>
           <div className="flex h-dvh w-full">
             <aside className="my-2 ml-2 hidden w-64 shrink-0 overflow-hidden rounded-2xl border bg-card md:block">
               <SidebarContent />
@@ -109,6 +111,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </Sheet>
         </JournalListProvider>
       </SharedThreadsProvider>
-    </PersonaProvider>
+    </AvatarSlotProvider>
+  </PersonaProvider>
   );
 }

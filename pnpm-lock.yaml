@@ -163,7 +163,7 @@ settings:
   excludeLinksFromLockfile: false
 
 overrides:
-  '@personaai/react': 0.31.0
+  '@personaai/react': 0.31.7
 
 importers:
 
@@ -184,9 +184,12 @@ importers:
       '@personaai/adapters':
         specifier: ^0.18.0
         version: 0.18.0(express@5.3.0(supports-color@7.2.0))(next@16.4.6(@babel/core@7.29.7(supports-color@7.2.0))(@types/node@20.19.43)(react-dom@19.3.1(react@19.3.1))(react@19.3.1))(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(zod@4.6.7)
+      '@personaai/avatar':
+        specifier: ^0.3.1
+        version: 0.3.1(@personaai/react@0.31.7(react-dom@19.3.1(react@19.3.1))(react@19.3.1))(react@19.3.1)
       '@personaai/react':
-        specifier: 0.31.0
-        version: 0.31.0(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
+        specifier: 0.31.7
+        version: 0.31.7(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       '@personaai/runtime':
         specifier: 0.27.0
         version: 0.27.0(zod@4.6.7)
@@ -991,12 +994,25 @@ packages:
       rxjs:
         optional: true
 
+  '@personaai/avatar@0.3.1':
+    resolution: {integrity: sha512-MqNf9Vz4+0wDMR25xPRfEnq9Qlqxl1B16nxToHYR8/4ZNX0ADMrJj6nhBF6LzAYl2NaeVCrHSj1xXdEHrgSmgA==}
+    engines: {node: '>=18'}
+    hasBin: true
+    peerDependencies:
+      '@personaai/react': 0.31.7
+      react: '>=18.0.0'
+    peerDependenciesMeta:
+      '@personaai/react':
+        optional: true
+      react:
+        optional: true
+
   '@personaai/logger@0.1.0':
     resolution: {integrity: sha512-ra5T+aBNzDmiabJ161y87SJJT9x3MHuFfAL1UCxSY3IO6AOJtF5UcXdsLVcxkugeOIto6Ppsm+adGLLR9s50Kw==}
     engines: {node: '>=18'}
 
-  '@personaai/react@0.31.0':
-    resolution: {integrity: sha512-Mp+39QY0/K+h1Hdy8N11GHdYQEb9mg+PbzF4QtFLlDy3JRKRJ8pVu277KUPb/5QoXIvCWkNP0fNLSQj1tvraPw==}
+  '@personaai/react@0.31.7':
+    resolution: {integrity: sha512-YFCDkRSjCpArb8kX6W7uZG6hdzHrFMlMaKjSLhZO/BtRFUBOrNS21J+HstWWoQ9ccjcwGOL/TJ8Gz4xxCrz+YA==}
     engines: {node: '>=18'}
     peerDependencies:
       react: '>=18.0.0'
@@ -5383,7 +5399,7 @@ snapshots:
   '@personaai/adapters@0.18.0(express@5.3.0(supports-color@7.2.0))(next@16.4.6(@babel/core@7.29.7(supports-color@7.2.0))(@types/node@20.19.43)(react-dom@19.3.1(react@19.3.1))(react@19.3.1))(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(zod@4.6.7)':
     dependencies:
       '@personaai/logger': 0.1.0
-      '@personaai/react': 0.31.0(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
+      '@personaai/react': 0.31.7(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       '@personaai/runtime': 0.26.0(zod@4.6.7)
       '@personaai/sdk': 0.32.0(zod@4.6.7)
     optionalDependencies:
@@ -5394,9 +5410,14 @@ snapshots:
       - react-dom
       - zod
 
+  '@personaai/avatar@0.3.1(@personaai/react@0.31.7(react-dom@19.3.1(react@19.3.1))(react@19.3.1))(react@19.3.1)':
+    optionalDependencies:
+      '@personaai/react': 0.31.7(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
+      react: 19.3.1
+
   '@personaai/logger@0.1.0': {}
 
-  '@personaai/react@0.31.0(react-dom@19.3.1(react@19.3.1))(react@19.3.1)':
+  '@personaai/react@0.31.7(react-dom@19.3.1(react@19.3.1))(react@19.3.1)':
     dependencies:
       '@personaai/logger': 0.1.0
       react: 19.3.1

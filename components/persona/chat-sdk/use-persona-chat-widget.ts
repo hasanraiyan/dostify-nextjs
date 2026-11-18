@@ -98,6 +98,7 @@ export function usePersonaChatWidget(options: UsePersonaChatWidgetOptions = {}) 
     threadId: activeThreadId,
     agentVersion: voiceAgentVersion,
     environment: voiceEnvironment,
+    autoPrefetch: true,
   });
 
   const setActiveThread = useCallback(
@@ -118,38 +119,25 @@ export function usePersonaChatWidget(options: UsePersonaChatWidgetOptions = {}) 
     [setActiveThread, refreshThreads]
   );
 
-  // Lazy thread creation for voice calls started from an ephemeral new chat ("/").
-  // Mirrors useChat's first-message thread minting so voice turns are persisted into
-  // a real conversation document that survives reloads.
-  const pendingVoiceStartRef = useRef(false);
-
-  const startVoice = useCallback(async () => {
-    if (activeThreadId) {
-      return voice.start();
+  // Start voice immediately under the direct user gesture so microphone permissions
+  // and Web Audio context aren't blocked by browser autoplay/activation policies.
+  // Mints a thread concurrently in the background if starting from an ephemeral chat ("/").
+  const startVoice = useCallback(() => {
+    const startPromise = voice.start();
+    if (!activeThreadId) {
+      void createThread(agentId)
+        .then((created) => {
+          const resolvedId = created?._id ?? (created as any)?.id;
+          if (resolvedId) {
+            handleThreadCreated(resolvedId);
+          }
+        })
+        .catch((err) => {
+          console.warn("[voice] background thread creation failed:", err);
+        });
     }
-    pendingVoiceStartRef.current = true;
-    try {
-      const created = await createThread(agentId);
-      const resolvedId = created?._id ?? (created as any)?.id;
-      if (resolvedId) {
-        handleThreadCreated(resolvedId);
-      } else {
-        pendingVoiceStartRef.current = false;
-        return voice.start();
-      }
-    } catch (err) {
-      console.warn("[voice] thread creation before call failed", err);
-      pendingVoiceStartRef.current = false;
-      return voice.start();
-    }
+    return startPromise;
   }, [activeThreadId, createThread, agentId, handleThreadCreated, voice]);
-
-  useEffect(() => {
-    if (pendingVoiceStartRef.current && activeThreadId) {
-      pendingVoiceStartRef.current = false;
-      void voice.start();
-    }
-  }, [activeThreadId, voice]);
 
   const wrappedVoice = useMemo(
     () => ({

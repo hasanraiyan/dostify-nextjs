@@ -23,6 +23,7 @@
     "@clerk/nextjs": "^7.9.22",
     "@modelcontextprotocol/ext-apps": "^2.0.4",
     "@personaai/adapters": "^0.18.0",
+    "@personaai/avatar": "^0.3.1",
     "@personaai/react": "^0.31.7",
     "@personaai/runtime": "0.27.0",
     "@personaai/sdk": "^0.32.0",

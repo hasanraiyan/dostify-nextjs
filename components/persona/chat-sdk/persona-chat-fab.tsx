@@ -79,6 +79,18 @@ export function PersonaChatFab({
     setAppSplit(false);
   }
 
+  // A live call collapses the panel to a compact dock (avatar + caption); the
+  // view stays mounted while minimized, so the call keeps running.
+  const [voiceActive, setVoiceActive] = React.useState(false);
+  const handleVoiceActiveChange = React.useCallback(
+    (active: boolean) => {
+      setVoiceActive(active);
+      if (active) setOpen(false);
+    },
+    [setOpen],
+  );
+  const showDock = voiceActive && !isOpen;
+
   const panelId = React.useId();
 
   // Escape dismisses the drawer first, then the panel. A window-level listener
@@ -121,6 +133,9 @@ export function PersonaChatFab({
               {...chatProps}
               title={title}
               layout="sidebar-main"
+              onVoiceActiveChange={handleVoiceActiveChange}
+              voiceDockVisible={showDock}
+              onVoiceDockExpand={() => setOpen(true)}
               threadListCollapsible
               threadListOverlay
               threadListCollapsed={sidebarCollapsed}
@@ -142,7 +157,7 @@ export function PersonaChatFab({
         )}
       </div>
 
-      {!isOpen && (
+      {!isOpen && !showDock && (
         <button
           type="button"
           aria-label={launcherLabel}

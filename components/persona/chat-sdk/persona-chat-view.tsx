@@ -4,6 +4,9 @@ import * as React from "react";
 import {
   FolderOpenIcon,
   ListIcon,
+  MicrophoneIcon,
+  MicrophoneSlashIcon,
+  PhoneXIcon,
   SidebarSimpleIcon,
   TerminalIcon,
 } from "@phosphor-icons/react";
@@ -27,6 +30,7 @@ import { SubagentSheet } from "./subagent-sheet";
 import { MemoryWorkspaceDialog } from "./memory-workspace-dialog";
 import { SandboxTerminalDialog } from "./sandbox-terminal-dialog";
 import { VoiceIndicator } from "./voice-indicator";
+import { VoiceDock } from "./voice-dock";
 import { AgentPicker, type PersonaAgentOption } from "./agent-picker";
 import { flattenSubagentActivity } from "./message-grouping";
 import {
@@ -210,6 +214,12 @@ export interface PersonaChatViewProps extends UsePersonaChatWidgetOptions {
   errorState?: React.ReactNode | ((error: Error) => React.ReactNode);
   /** Raw AG-UI event passthrough (tool calls, steps, subagent activity). */
   onEvent?: (event: PersonaStreamingEvent) => void;
+  /** Show the compact call dock (avatar + caption + mic/end) instead of this view's own call UI. */
+  voiceDockVisible?: boolean;
+  /** The dock's avatar was tapped: bring the full chat back. */
+  onVoiceDockExpand?: () => void;
+  /** Fired when voice call becomes active or inactive. */
+  onVoiceActiveChange?: (active: boolean) => void;
   className?: string;
 }
 
@@ -235,6 +245,9 @@ export function PersonaChatView({
   onThreadChange,
   agents,
   onEvent,
+  voiceDockVisible = false,
+  onVoiceDockExpand,
+  onVoiceActiveChange,
   title = "Assistant",
   emptyTitle = "How can I help?",
   emptyDescription,
@@ -326,6 +339,10 @@ export function PersonaChatView({
     onEvent,
     enableVoice: showVoice,
   });
+
+  React.useEffect(() => {
+    onVoiceActiveChange?.(isVoiceActive);
+  }, [isVoiceActive, onVoiceActiveChange]);
 
   // Opening a thread started with another Agent (deep link, sidebar, browser
   // back/forward) moves the picker to that Agent. Adjusting during render —
@@ -658,7 +675,11 @@ export function PersonaChatView({
             />
           )
         ) : (
-          <ChatScroller className={classNames.scroller}>
+          <ChatScroller
+            className={classNames.scroller}
+            autoScrollToBottom={isVoiceActive}
+            hideScrollButton={true}
+          >
             {messages.map(({ message, reasoningPhases }) => (
               <ChatScrollerItem key={message.id}>
                 {renderOneMessage(message, reasoningPhases)}
@@ -701,12 +722,55 @@ export function PersonaChatView({
               classNames.composer
             )}
           >
+            {/* Compact voice dock when minimized */}
+            {voiceDockVisible && isVoiceActive && onVoiceDockExpand && (
+              <VoiceDock voice={voice} onExpand={onVoiceDockExpand} />
+            )}
+
             {/* Only occupies space while a call is actually live — the idle
                 "start voice" control lives inside the composer's own send
                 slot below, not as a separate row. */}
             {showVoice && isVoiceActive && (
-              <div className="mb-2 flex flex-col items-center justify-center">
-                <VoiceIndicator state={voice.state} size={200} />
+              <div className="mb-3 flex flex-col items-center justify-center gap-2.5">
+                <div className="relative flex flex-col items-center justify-center">
+                  <VoiceIndicator
+                    state={voice.state}
+                    voice={voice}
+                    size={290}
+                    variant="avatar"
+                  />
+                  <div className="mt-3 flex items-center justify-center gap-3">
+                    <button
+                      type="button"
+                      onClick={() => voice.mute(!voice.isMuted)}
+                      title={
+                        voice.isMuted
+                          ? "Unmute microphone"
+                          : "Mute microphone"
+                      }
+                      className={cn(
+                        "flex size-10 items-center justify-center rounded-full border transition-all duration-150 shadow-sm",
+                        voice.isMuted
+                          ? "bg-amber-500/10 text-amber-600 border-amber-500/30 hover:bg-amber-500/20"
+                          : "bg-muted text-foreground/80 border-border hover:bg-muted/80 hover:text-foreground",
+                      )}
+                    >
+                      {voice.isMuted ? (
+                        <MicrophoneSlashIcon className="size-5" />
+                      ) : (
+                        <MicrophoneIcon className="size-5" />
+                      )}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => voice.stop()}
+                      title="End voice call"
+                      className="flex size-10 items-center justify-center rounded-full bg-destructive text-white shadow-sm hover:opacity-90 active:scale-95 transition-all"
+                    >
+                      <PhoneXIcon weight="fill" className="size-5" />
+                    </button>
+                  </div>
+                </div>
                 <VoiceImagesStrip transcript={voice.transcript} />
               </div>
             )}

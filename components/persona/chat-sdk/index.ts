@@ -15,5 +15,7 @@ export { groupReasoning, flattenSubagentActivity, type GroupedMessage } from "./
 export { toolCallStatus } from "./tool-status";
 export { MemoryWorkspaceDialog, type MemoryWorkspaceDialogProps } from "./memory-workspace-dialog";
 export { SandboxTerminalDialog, type SandboxTerminalDialogProps } from "./sandbox-terminal-dialog";
+export { VoiceDock } from "./voice-dock";
+export { VoiceFab, type VoiceFabProps } from "./voice-fab";
 export { AgentPicker, type PersonaAgentOption } from "./agent-picker";
 export { PersonaFrontendTools } from "./frontend-tools";

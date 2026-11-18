@@ -16,6 +16,7 @@ import {
 import { PersonaProvider } from "@personaai/react";
 import { UserButton } from "@clerk/nextjs";
 import { PersonaChatFab, PersonaFrontendTools } from "@/components/persona/chat-sdk";
+import { AvatarSlotProvider } from "@/components/persona/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { AGENTS, DEFAULT_VOICE_AGENT_ID } from "@/app/agents";
@@ -62,8 +63,9 @@ export function AssistantExperience() {
       defaultAgentId={process.env.NEXT_PUBLIC_PERSONA_AGENT_ID}
       logLevel="debug"
     >
-      <PersonaFrontendTools />
-      <main className="relative flex min-h-dvh flex-col bg-background">
+      <AvatarSlotProvider>
+        <PersonaFrontendTools />
+        <main className="relative flex min-h-dvh flex-col bg-background">
         <header className="flex h-14 shrink-0 items-center justify-between border-b border-border px-4 sm:px-6">
           <div className="flex items-center gap-2">
             <span className="flex size-7 items-center justify-center rounded-lg bg-primary text-primary-foreground">
@@ -163,6 +165,7 @@ export function AssistantExperience() {
           },
         ]}
       />
+      </AvatarSlotProvider>
     </PersonaProvider>
   );
 }

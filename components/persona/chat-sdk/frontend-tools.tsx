@@ -26,6 +26,8 @@ import {
 import { HelplineCard } from "./dostify-widgets";
 import { LocationCard, fetchLocation } from "./location-tool";
 import { setThemePref } from "@/lib/dostify/theme";
+import { useAvatarTools } from "@personaai/avatar/persona";
+import { useSlottedAvatar } from "../avatar";
 
 /**
  * Frontend tools: tools that run in the user's browser, which the agent can
@@ -360,6 +362,10 @@ export function PersonaFrontendTools() {
     },
     render: (args) => <CountdownTimer seconds={args.seconds} label={args.label} />,
   });
+
+  // Let the agent emote and gesture: set_avatar_emotion / trigger_avatar_reaction, derived from
+  // what the avatar on screen can actually do (no hand-typed list to drift).
+  useAvatarTools(useSlottedAvatar());
 
   return null;
 }
