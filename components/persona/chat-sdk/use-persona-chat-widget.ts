@@ -11,6 +11,7 @@ import {
   type SendMessageOverride,
 } from "@personaai/react";
 import { useGlobalVoice } from "./global-voice-context";
+import { useVoiceUsage } from "@/lib/dostify/use-voice-usage";
 import { useSharedThreads, useStalledFlag } from "./threads-context";
 import { groupReasoning } from "./message-grouping";
 
@@ -102,6 +103,9 @@ export function usePersonaChatWidget(options: UsePersonaChatWidgetOptions = {}) 
     environment: voiceEnvironment,
     autoPrefetch: !globalVoiceContext,
   });
+
+  // The global provider reports its own calls; only report ours when it is absent.
+  useVoiceUsage(globalVoiceContext ? "idle" : localVoice.state);
 
   const voice = globalVoiceContext?.voice ?? localVoice;
 

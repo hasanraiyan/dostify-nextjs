@@ -4,6 +4,7 @@ import * as React from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useVoice, type UseVoiceResult } from "@personaai/react";
 import { VoiceDock } from "./voice-dock";
+import { useVoiceUsage } from "@/lib/dostify/use-voice-usage";
 import { DEFAULT_VOICE_AGENT_ID } from "@/app/agents";
 import { useAvatarPref } from "@/components/dostify/use-avatar-pref";
 
@@ -28,6 +29,8 @@ export function GlobalVoiceProvider({ children }: { children: React.ReactNode })
     agentId: voiceAgentId,
     autoPrefetch: true,
   });
+
+  useVoiceUsage(voice.state);
 
   const isVoiceActive = !["idle", "ended", "error"].includes(voice.state);
 

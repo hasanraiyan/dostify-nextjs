@@ -5,6 +5,7 @@ import { useVoice } from "@personaai/react";
 import type { AvatarPack } from "@personaai/avatar";
 import type { AvatarId } from "@/lib/dostify/avatar-config";
 import { VoiceDock } from "./voice-dock";
+import { useVoiceUsage } from "@/lib/dostify/use-voice-usage";
 
 /**
  * Voice-only floating launcher. The FAB is the persona's avatar in a circle;
@@ -58,6 +59,8 @@ export function VoiceFab({
     autoPrefetch: true,
     ...(proactiveGreeting !== undefined ? ({ proactiveGreeting } as any) : {}),
   });
+
+  useVoiceUsage(voice.state);
 
   const live = !["idle", "ended", "error"].includes(voice.state);
 

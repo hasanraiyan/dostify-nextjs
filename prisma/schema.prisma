@@ -22,6 +22,8 @@ model User {
   createdAt      DateTime       @default(now())
   updatedAt      DateTime       @updatedAt
   journalEntries JournalEntry[]
+  usage          UsageMonthly[]
+  voiceSessions  VoiceSession[]
 }
 
 model JournalEntry {
@@ -35,4 +37,28 @@ model JournalEntry {
   createdAt DateTime @default(now())
 
   @@index([userId, createdAt])
+}
+
+/// Free-plan counters, one row per user per month (IST, "YYYY-MM").
+model UsageMonthly {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  month     String
+  messages  Int      @default(0)
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, month])
+}
+
+/// One live voice call. Reported by the browser when it connects and ends;
+/// an open call counts for at most MAX_CALL_SECONDS.
+model VoiceSession {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  startedAt DateTime  @default(now())
+  endedAt   DateTime?
+
+  @@index([userId, startedAt])
 }
