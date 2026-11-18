@@ -74,7 +74,7 @@ Implemented as MCP tools in `app/[transport]/route.ts` backed by Prisma:
 **Phase 2: Tools (Tasks, Journal, Pomodoro)**
 - [ ] Add Prisma models + migration.
 - [ ] Add MCP tools in `app/[transport]/route.ts`.
-- [ ] Custom tool cards in chat for tasks / timer / journal.
+- [x] Custom tool cards: helpline and breathing (tasks, focus and reminders were dropped from scope).
 
 **Phase 3: Reminders and cleanup** (cleanup DONE: Twilio/WhatsApp/SMS/call code, phone number field and extra agents removed)
 - [ ] In-app reminders.
