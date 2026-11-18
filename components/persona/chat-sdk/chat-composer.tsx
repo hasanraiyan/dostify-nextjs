@@ -128,7 +128,12 @@ function ChatComposer({
   const submit = () => {
     if (!canSend) return;
     if (isVoiceActive) {
-      if (trimmed) onSendToVoice?.(trimmed);
+      if (trimmed) {
+        onSendToVoice?.(trimmed);
+        // A normal send clears the field through the parent; a voice send
+        // does not, so clear it here or the sent text stays in the box.
+        onChange("");
+      }
     } else if (!isStreaming) {
       onSend();
     }
