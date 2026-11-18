@@ -67,9 +67,9 @@ Implemented as MCP tools in `app/[transport]/route.ts` backed by Prisma:
 - [ ] Run DB (`pnpm db:up`, `pnpm db:migrate`) and confirm starter runs (`pnpm dev`).
 
 **Phase 1: Friend chat MVP**
-- [ ] Create Dostify agent in Persona; wire into `app/agents.ts`.
-- [ ] Rebrand UI (name, logo, empty state, colors).
-- [ ] Keep only Dostify in the agent picker.
+- [x] Create Dostify agent in Persona; wire into `app/agents.ts`.
+- [x] Rebrand UI (name, logo, empty state, colors).
+- [x] Keep only Dostify in the agent picker.
 
 **Phase 2: Tools (Tasks, Journal, Pomodoro)**
 - [ ] Add Prisma models + migration.
