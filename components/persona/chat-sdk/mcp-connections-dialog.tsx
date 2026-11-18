@@ -63,37 +63,22 @@ function ConnectorTile({ name }: { name: string }) {
   );
 }
 
-export interface McpConnectionsDialogProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  /** Every user-mode MCP attached to the Agent (`useMcpConnections().connections`). */
+export interface McpConnectionsListProps {
   connections: PersonaMcpConnection[];
-  /** Loads the consent flow and redirects to the provider. */
   onConnect: (connection: PersonaMcpConnection) => void;
-  /** Revokes this end user's stored grant (DELETE …/oauth/user/connection). */
   onRevoke: (mcpId: string) => Promise<void>;
-  /** The connector just confirmed by the OAuth callback — highlighted once. */
   justConnectedMcpId?: string | null;
   isLoading?: boolean;
 }
 
-/**
- * The managing view the connect banner can't be: one row per user-mode MCP,
- * showing whether this end user's account is connected and letting them
- * either start the consent flow (same-tab redirect to `authorizeUrl`) or
- * revoke the stored grant. Revoking only drops this user's token — the
- * connector itself stays attached to the Agent.
- */
-export function McpConnectionsDialog({
-  open,
-  onOpenChange,
+/** One row per user-mode MCP with Connect / Reconnect / Disconnect. Used by the dialog and the Connectors page. */
+export function McpConnectionsList({
   connections,
   onConnect,
   onRevoke,
   justConnectedMcpId,
   isLoading,
-}: McpConnectionsDialogProps) {
-  const isMobile = useIsMobile();
+}: McpConnectionsListProps) {
   const [revokingId, setRevokingId] = React.useState<string | null>(null);
   const [error, setError] = React.useState<string | null>(null);
 
@@ -112,9 +97,7 @@ export function McpConnectionsDialog({
     [onRevoke]
   );
 
-  const connectedCount = connections.filter((c) => statusOf(c) === "connected").length;
-
-  const body = (
+  return (
     <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
       {isLoading && connections.length === 0 ? (
         <ul className="divide-y divide-border" aria-busy="true">
@@ -216,6 +199,49 @@ export function McpConnectionsDialog({
       )}
       {error && <p className="px-4 pb-3 text-xs text-destructive">{error}</p>}
     </div>
+  );
+}
+
+export interface McpConnectionsDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  /** Every user-mode MCP attached to the Agent (`useMcpConnections().connections`). */
+  connections: PersonaMcpConnection[];
+  /** Loads the consent flow and redirects to the provider. */
+  onConnect: (connection: PersonaMcpConnection) => void;
+  /** Revokes this end user's stored grant (DELETE …/oauth/user/connection). */
+  onRevoke: (mcpId: string) => Promise<void>;
+  /** The connector just confirmed by the OAuth callback — highlighted once. */
+  justConnectedMcpId?: string | null;
+  isLoading?: boolean;
+}
+
+/**
+ * The managing view the connect banner can't be: one row per user-mode MCP,
+ * showing whether this end user's account is connected and letting them
+ * either start the consent flow (same-tab redirect to `authorizeUrl`) or
+ * revoke the stored grant. Revoking only drops this user's token — the
+ * connector itself stays attached to the Agent.
+ */
+export function McpConnectionsDialog({
+  open,
+  onOpenChange,
+  connections,
+  onConnect,
+  onRevoke,
+  justConnectedMcpId,
+  isLoading,
+}: McpConnectionsDialogProps) {
+  const isMobile = useIsMobile();
+  const connectedCount = connections.filter((c) => statusOf(c) === "connected").length;
+  const body = (
+    <McpConnectionsList
+      connections={connections}
+      onConnect={onConnect}
+      onRevoke={onRevoke}
+      justConnectedMcpId={justConnectedMcpId}
+      isLoading={isLoading}
+    />
   );
 
   const description = `${connectedCount} of ${connections.length} connected. Revoking removes the stored access token; the connector stays attached to the assistant.`;

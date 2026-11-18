@@ -43,6 +43,7 @@ const PAGES = {
   new_chat: { path: "/", label: "a new chat" },
   assistant: { path: "/assistant", label: "the assistant showcase" },
   journal: { path: "/journal", label: "the journal" },
+  connectors: { path: "/connectors", label: "the connectors page" },
 } as const;
 type PageKey = keyof typeof PAGES;
 
@@ -208,7 +209,7 @@ export function PersonaFrontendTools() {
   useFrontendTool<{ page: PageKey }>({
     name: "navigate_to",
     description:
-      'Open a page of this app for the user. "new_chat" starts a fresh conversation; "journal" opens the journal; "assistant" opens the assistant feature showcase.',
+      'Open a page of this app for the user. "new_chat" starts a fresh conversation; "journal" opens the journal; "connectors" opens the page where the user connects their accounts; "assistant" opens the assistant feature showcase.',
     parameters: {
       type: "object",
       properties: { page: { type: "string", enum: Object.keys(PAGES) } },

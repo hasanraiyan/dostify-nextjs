@@ -2,12 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ChatCircleIcon, NotebookIcon, type Icon } from "@phosphor-icons/react";
+import { ChatCircleIcon, NotebookIcon, PlugsConnectedIcon, type Icon } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 
 const LINKS: { href: string; label: string; icon: Icon }[] = [
   { href: "/", label: "Chat", icon: ChatCircleIcon },
   { href: "/journal", label: "Journal", icon: NotebookIcon },
+  { href: "/connectors", label: "Connectors", icon: PlugsConnectedIcon },
 ];
 
 /** The sidebar's main navigation. */
