@@ -16,6 +16,10 @@ export function listEntries(userId: string, opts: { limit?: number; query?: stri
   })
 }
 
+export function getEntry(userId: string, id: string) {
+  return prisma.journalEntry.findFirst({ where: { id, userId } })
+}
+
 export function createEntry(userId: string, data: { text: string; mood?: number }) {
   return prisma.journalEntry.create({ data: { userId, ...data } })
 }

@@ -4,12 +4,12 @@ import * as React from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { PersonaProvider } from "@personaai/react";
-import { UserButton, useUser } from "@clerk/nextjs";
+import { AccountSummary } from "@/components/dostify/account-summary";
 import {
   ChatCircleIcon,
   HeartIcon,
-  ListChecksIcon,
-  TimerIcon,
+  NotebookIcon,
+  WindIcon,
 } from "@phosphor-icons/react";
 import {
   PersonaChatView,
@@ -24,11 +24,8 @@ import { AGENTS, DEFAULT_VOICE_AGENT_ID } from "@/app/agents";
  * `/c/<id>` = an existing thread.
  */
 function AccountFooter() {
-  const { user } = useUser();
-  if (!user) return null;
-
   return (
-    <div className="flex flex-col gap-1 p-2">
+    <div className="flex flex-col gap-2 p-2">
       <div className="flex gap-1">
         {[
           { href: "/journal", label: "Journal" },
@@ -43,19 +40,7 @@ function AccountFooter() {
           </Link>
         ))}
       </div>
-      <div className="flex items-center gap-2 pt-1">
-        <UserButton appearance={{ elements: { avatarBox: "size-8" } }} />
-        <div className="min-w-0 flex-1">
-          <p className="truncate text-xs font-medium">
-            {user.fullName || user.username || "Signed in"}
-          </p>
-          {user.primaryEmailAddress && (
-            <p className="truncate text-[11px] text-muted-foreground">
-              {user.primaryEmailAddress.emailAddress}
-            </p>
-          )}
-        </div>
-      </div>
+      <AccountSummary />
     </div>
   );
 }
@@ -110,29 +95,13 @@ export function ChatShell({ children }: { children: React.ReactNode }) {
           title="Dostify"
           threadListCollapsible
           threadListFooter={<AccountFooter />}
-          emptyTitle="Kya chal raha hai, dost?"
-          emptyDescription="Baat kar, vent kar, ya kaam bata. Tasks, focus aur reminders main sambhal lunga."
+          emptyTitle="What's on your mind?"
+          emptyDescription="Talk, vent, or ask for help. I can also keep your journal."
           starterPrompts={[
-            {
-              label: "Aaj ka plan bana de",
-              icon: ListChecksIcon,
-              template: "Aaj ka plan bana de",
-            },
-            {
-              label: "Bahut stress hai",
-              icon: HeartIcon,
-              template: "Yaar bahut stress hai, baat karni hai",
-            },
-            {
-              label: "Focus session shuru kar",
-              icon: TimerIcon,
-              template: "25 minute ka focus session shuru kar",
-            },
-            {
-              label: "Tu kya kya kar sakta hai?",
-              icon: ChatCircleIcon,
-              template: "Tu kya kya kar sakta hai?",
-            },
+            { label: "I need to vent", icon: HeartIcon, template: "I need to vent for a bit" },
+            { label: "Help me calm down", icon: WindIcon, template: "I'm stressed. Can you help me calm down?" },
+            { label: "Write in my journal", icon: NotebookIcon, template: "I want to write something in my journal" },
+            { label: "What can you do?", icon: ChatCircleIcon, template: "What can you do?" },
           ]}
         />
       </div>

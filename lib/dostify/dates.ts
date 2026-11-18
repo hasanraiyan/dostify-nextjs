@@ -6,11 +6,11 @@ export function dayKey(date: Date): string {
   return date.toLocaleDateString('en-CA', { timeZone: TIME_ZONE })
 }
 
-/** "Aaj", "Kal", or e.g. "14 Nov 2026" for the day `date` falls on. */
+/** "Today", "Yesterday", or e.g. "14 Nov 2026" for the day `date` falls on. */
 export function dayLabel(date: Date, now: Date = new Date()): string {
   const key = dayKey(date)
-  if (key === dayKey(now)) return 'Aaj'
-  if (key === dayKey(new Date(now.getTime() - DAY_MS))) return 'Kal'
+  if (key === dayKey(now)) return 'Today'
+  if (key === dayKey(new Date(now.getTime() - DAY_MS))) return 'Yesterday'
   return date.toLocaleDateString('en-IN', {
     timeZone: TIME_ZONE,
     day: 'numeric',

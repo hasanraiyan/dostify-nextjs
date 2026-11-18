@@ -18,35 +18,36 @@ async function requireUser() {
   return user;
 }
 
-export async function addEntry(formData: FormData) {
+/** The list lives in the journal layout, so refresh the whole segment. */
+const refresh = () => revalidatePath("/journal", "layout");
+
+/** Autosave target: creates the entry when `id` is null, otherwise updates it. */
+export async function saveEntry(
+  id: string | null,
+  value: string,
+): Promise<{ id: string } | { error: string }> {
   const user = await requireUser();
-  const parsed = text.safeParse(formData.get("text"));
-  if (!parsed.success) return; // empty text: ignore silently
-  await createEntry(user.id, { text: parsed.data });
-  revalidatePath("/journal");
+  const parsed = text.safeParse(value);
+  if (!parsed.success) return { error: "Entry is empty or too long." };
+
+  if (id) {
+    if (!(await updateEntryText(user.id, id, parsed.data))) return { error: "Entry not found." };
+    refresh();
+    return { id };
+  }
+  const created = await createEntry(user.id, { text: parsed.data });
+  refresh();
+  return { id: created.id };
 }
 
-export async function updateEntry(formData: FormData) {
+export async function deleteEntry(id: string) {
   const user = await requireUser();
-  const id = formData.get("id");
-  const parsed = text.safeParse(formData.get("text"));
-  if (typeof id !== "string" || !parsed.success) return;
-  await updateEntryText(user.id, id, parsed.data);
-  revalidatePath("/journal");
-}
-
-export async function deleteEntry(formData: FormData) {
-  const user = await requireUser();
-  const id = formData.get("id");
-  if (typeof id !== "string") return;
   await removeEntry(user.id, id);
-  revalidatePath("/journal");
+  refresh();
 }
 
-export async function togglePin(formData: FormData) {
+export async function togglePin(id: string, pinned: boolean) {
   const user = await requireUser();
-  const id = formData.get("id");
-  if (typeof id !== "string") return;
-  await setEntryPinned(user.id, id, formData.get("pinned") === "true");
-  revalidatePath("/journal");
+  await setEntryPinned(user.id, id, pinned);
+  refresh();
 }

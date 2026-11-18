@@ -1,23 +1,19 @@
-import { Suspense } from "react";
 import type { Metadata } from "next";
-import { EntriesSkeleton } from "./entries-skeleton";
-import { EntryForm } from "./entry-form";
-import { EntryList } from "./entry-list";
-import { SearchBox, SearchBoxFallback } from "./search-box";
+import Link from "next/link";
 
 export const metadata: Metadata = { title: "Journal — Dostify" };
 
-export default function JournalPage({ searchParams }: PageProps<"/journal">) {
+/** Laptop-only placeholder for the right pane; on phones the list shows instead. */
+export default function JournalPage() {
   return (
-    <>
-      <h1 className="font-heading text-2xl font-semibold">Journal</h1>
-      <EntryForm />
-      <Suspense fallback={<SearchBoxFallback />}>
-        <SearchBox />
-      </Suspense>
-      <Suspense fallback={<EntriesSkeleton />}>
-        <EntryList searchParams={searchParams as Promise<{ q?: string }>} />
-      </Suspense>
-    </>
+    <div className="flex flex-1 flex-col items-center justify-center gap-3 p-6 text-center">
+      <p className="text-sm text-muted-foreground">Select an entry, or start a new one.</p>
+      <Link
+        href="/journal/new"
+        className="rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90"
+      >
+        New entry
+      </Link>
+    </div>
   );
 }

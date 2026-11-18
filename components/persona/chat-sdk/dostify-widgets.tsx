@@ -46,10 +46,10 @@ export function HelplineCard() {
       <CardHeader>
         <CardTitle className="flex items-center gap-1.5">
           <HeartIcon weight="fill" className="size-4 text-primary" />
-          Tu akela nahi hai
+          You are not alone
         </CardTitle>
         <CardDescription>
-          Agar tu abhi bahut mushkil mein hai, in logon se abhi baat kar sakta hai. Call free hai.
+          If things feel too heavy right now, you can talk to these people. The calls are free.
         </CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col gap-2">
@@ -70,7 +70,7 @@ export function HelplineCard() {
           </div>
         ))}
         <p className="pt-1 text-xs text-muted-foreground">
-          Kisi apne ke paas jaa, family ya dost, jo tere saath reh sake.
+          Please reach out to someone you trust, like family or a friend, who can be with you.
         </p>
       </CardContent>
     </Card>
@@ -79,9 +79,9 @@ export function HelplineCard() {
 
 // ── 4-7-8 breathing exercise ────────────────────────────────────────────────
 const PHASES = [
-  { label: "Saans andar", seconds: 4, scale: 1 },
-  { label: "Roke rakh", seconds: 7, scale: 1 },
-  { label: "Saans bahar", seconds: 8, scale: 0.55 },
+  { label: "Breathe in", seconds: 4, scale: 1 },
+  { label: "Hold", seconds: 7, scale: 1 },
+  { label: "Breathe out", seconds: 8, scale: 0.55 },
 ] as const;
 const CYCLES = 4;
 
@@ -135,10 +135,10 @@ export function BreathingExercise() {
         </CardTitle>
         <CardDescription>
           {done
-            ? "Ho gaya. Kaisa lag raha hai ab?"
+            ? "Done. How do you feel now?"
             : active
               ? `Round ${cycle} of ${CYCLES}`
-              : "4 sec andar, 7 sec roko, 8 sec bahar. 4 rounds."}
+              : "In for 4, hold for 7, out for 8. Four rounds."}
         </CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col items-center gap-3">
@@ -166,7 +166,7 @@ export function BreathingExercise() {
           </Button>
         ) : (
           <Button size="sm" onClick={start}>
-            <PlayIcon /> {done ? "Phir se" : "Shuru karo"}
+            <PlayIcon /> {done ? "Again" : "Start"}
           </Button>
         )}
       </CardContent>

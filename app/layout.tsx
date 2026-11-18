@@ -29,9 +29,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Dostify — tera dost, jo kaam bhi karta hai",
+  title: "Dostify — your AI friend",
   description:
-    "Dostify is your AI dost: chat or talk in Hinglish, and it plans your tasks, focus sessions and reminders too.",
+    "Dostify is your AI friend: chat or talk, keep a journal, and get a hand when you need one.",
 };
 
 export default function RootLayout({
