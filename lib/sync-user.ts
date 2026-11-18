@@ -1,35 +1,27 @@
 import { clerkClient } from '@clerk/nextjs/server'
 import { prisma } from '@/lib/prisma'
+import { toUserFields } from '@/lib/user-fields'
 
 export async function syncClerkUser(userId: string) {
   try {
     const client = await clerkClient()
     const user = await client.users.getUser(userId)
 
-    const primaryEmail =
-      user.emailAddresses.find((e) => e.id === user.primaryEmailAddressId)
-        ?.emailAddress ?? user.emailAddresses[0]?.emailAddress
+    const { email, name, imageUrl } = toUserFields({
+      emails: user.emailAddresses.map((e) => ({ id: e.id, email: e.emailAddress })),
+      primaryEmailId: user.primaryEmailAddressId,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      username: user.username,
+      imageUrl: user.imageUrl,
+    })
 
-    if (!primaryEmail) return null
-
-    const name =
-      [user.firstName, user.lastName].filter(Boolean).join(' ').trim() ||
-      user.username ||
-      null
+    if (!email) return null
 
     return await prisma.user.upsert({
       where: { clerkId: user.id },
-      update: {
-        email: primaryEmail,
-        name,
-        imageUrl: user.imageUrl ?? null,
-      },
-      create: {
-        clerkId: user.id,
-        email: primaryEmail,
-        name,
-        imageUrl: user.imageUrl ?? null,
-      },
+      update: { email, name, imageUrl },
+      create: { clerkId: user.id, email, name, imageUrl },
     })
   } catch (error) {
     console.error('Failed to sync Clerk user to DB:', error)

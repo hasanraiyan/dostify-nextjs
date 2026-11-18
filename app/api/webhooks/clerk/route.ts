@@ -1,6 +1,7 @@
 import { headers } from 'next/headers'
 import { Webhook } from 'svix'
 import { prisma } from '@/lib/prisma'
+import { toUserFields } from '@/lib/user-fields'
 
 type ClerkEmailAddress = { id: string; email_address: string }
 type ClerkUser = {
@@ -51,32 +52,25 @@ export async function POST(request: Request) {
 
   try {
     if (type === 'user.created' || type === 'user.updated') {
-      const primaryEmail =
-        data.email_addresses?.find((e) => e.id === data.primary_email_address_id)
-          ?.email_address ?? data.email_addresses?.[0]?.email_address
+      const { email, name, imageUrl } = toUserFields({
+        emails: (data.email_addresses ?? []).map((e) => ({
+          id: e.id,
+          email: e.email_address,
+        })),
+        primaryEmailId: data.primary_email_address_id,
+        firstName: data.first_name,
+        lastName: data.last_name,
+        username: data.username,
+        imageUrl: data.image_url,
+      })
 
-      if (!primaryEmail) {
-        return new Response('No email address', { status: 400 })
-      }
-
-      const name =
-        [data.first_name, data.last_name].filter(Boolean).join(' ').trim() ||
-        data.username ||
-        null
+      // Nothing to store yet; 200 so Clerk doesn't retry.
+      if (!email) return Response.json({ received: true, skipped: 'no-email' })
 
       await prisma.user.upsert({
         where: { clerkId: data.id },
-        update: {
-          email: primaryEmail,
-          name,
-          imageUrl: data.image_url ?? null,
-        },
-        create: {
-          clerkId: data.id,
-          email: primaryEmail,
-          name,
-          imageUrl: data.image_url ?? null,
-        },
+        update: { email, name, imageUrl },
+        create: { clerkId: data.id, email, name, imageUrl },
       })
     } else if (type === 'user.deleted') {
       await prisma.user.delete({ where: { clerkId: data.id } }).catch(() => null)
@@ -84,7 +78,12 @@ export async function POST(request: Request) {
 
     return Response.json({ received: true })
   } catch (error) {
-    const message = error instanceof Error ? error.message : String(error)
-    return new Response(message, { status: 500 })
+    // Email already belongs to another clerkId: retrying can't fix it.
+    if (error instanceof Error && 'code' in error && error.code === 'P2002') {
+      console.error('Clerk webhook: email conflict for', type, data.id)
+      return Response.json({ received: true, skipped: 'email-conflict' })
+    }
+    console.error('Clerk webhook failed:', type, data.id, error)
+    return new Response('Webhook handler failed', { status: 500 })
   }
 }
