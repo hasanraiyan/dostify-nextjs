@@ -30,7 +30,7 @@ export interface VoiceFabProps {
   hideWhenIdle?: boolean;
   /** Avatar pack to use for the avatar (defaults to sakura, via AnimeVoiceAvatar) */
   pack?: AvatarPack;
-  /** Active avatar preference ("sakura" | "scarlet" | "orb") */
+  /** Active avatar preference ("sakura" | "scarlet") */
   avatarId?: AvatarId;
   /**
    * Optional proactive greeting trigger.

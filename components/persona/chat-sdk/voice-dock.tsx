@@ -126,7 +126,7 @@ export function VoiceDock({
   voice: UseVoiceResult;
   /** Avatar pack to use for the avatar (default: sakura, via AnimeVoiceAvatar) */
   pack?: AvatarPack;
-  /** Active avatar preference ("sakura" | "scarlet" | "orb") */
+  /** Active avatar preference ("sakura" | "scarlet") */
   avatarId?: AvatarId;
   /** Adds an "open chat" badge. Omit for a voice-only launcher. */
   onExpand?: () => void;
@@ -135,7 +135,6 @@ export function VoiceDock({
 }) {
   const { avatarId: prefAvatarId } = useAvatarPref();
   const avatarId = propAvatarId ?? prefAvatarId;
-  const isOrb = avatarId === "orb";
   const caption = useVanishingCaption(voice);
   const [small, setSmall] = React.useState(false);
   const [saying, setSaying] = React.useState(false);
@@ -307,18 +306,17 @@ export function VoiceDock({
         >
           {/* The art is a square with empty space under the shoulders, which
               left a dark gap inside the circle. Scale it up and push it down so
-              the shoulders run off the bottom edge and the circle is filled.
-              When Orb is selected, center it cleanly without the shoulder offset. */}
+              the shoulders run off the bottom edge and the circle is filled. */}
           <div
-            className={cn("size-full origin-center", isOrb && "flex items-center justify-center")}
-            style={isOrb ? undefined : { transform: "translateY(10.5%) scale(1.35)" }}
+            className="size-full origin-center"
+            style={{ transform: "translateY(10.5%) scale(1.35)" }}
           >
             <VoiceIndicator
               state={voice.state}
               voice={voice}
               pack={pack}
               size={!active ? 64 : small ? 60 : 120}
-              variant={isOrb ? "orb" : "avatar"}
+              variant="avatar"
               onAvatarReady={(a) => {
                 avatarRef.current = a;
               }}

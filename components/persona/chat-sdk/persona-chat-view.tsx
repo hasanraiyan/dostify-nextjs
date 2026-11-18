@@ -803,22 +803,15 @@ export function PersonaChatView({
                     )}
                   >
                     <div
-                      className={cn(
-                        "size-full origin-center",
-                        avatarId === "orb" && "flex items-center justify-center"
-                      )}
-                      style={
-                        avatarId === "orb"
-                          ? undefined
-                          : { transform: "translateY(10.5%) scale(1.35)" }
-                      }
+                      className="size-full origin-center"
+                      style={{ transform: "translateY(10.5%) scale(1.35)" }}
                     >
                       <VoiceIndicator
                         state={voice.state}
                         voice={voice}
                         pack={avatarPack}
-                        size={avatarId === "orb" ? 160 : 208}
-                        variant={avatarId === "orb" ? "orb" : "avatar"}
+                        size={208}
+                        variant="avatar"
                         onAvatarReady={(a) => {
                           inViewAvatarRef.current = a;
                         }}

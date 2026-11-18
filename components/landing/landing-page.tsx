@@ -1,6 +1,7 @@
 import { Footer } from "./footer";
 import { Header } from "./header";
 import { Hero } from "./hero";
+import { LandingAssistant } from "./landing-assistant";
 import { Closing, Faq, Journal, Steps } from "./sections";
 
 /**
@@ -20,6 +21,7 @@ export function LandingPage() {
         <Closing />
       </main>
       <Footer />
+      <LandingAssistant />
     </div>
   );
 }
