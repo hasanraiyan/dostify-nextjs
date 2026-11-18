@@ -16,30 +16,30 @@ import { AGENTS, DEFAULT_VOICE_AGENT_ID } from "@/app/agents";
 
 /**
  * The chat lives in the `(chat)` layout, not in a page, so navigating between
- * the new-chat URL (`/`) and a thread URL (`/c/<threadId>`) never unmounts it.
+ * the new-chat URL (`/chat`) and a thread URL (`/chat/<threadId>`) never unmounts it.
  * The URL is just a reflection of the active thread: `/` = ephemeral new chat,
- * `/c/<id>` = an existing thread.
+ * `/chat/<id>` = an existing thread.
  */
 export function ChatShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
 
   const threadId = React.useMemo(
-    () => /^\/c\/([^/]+)\/?$/.exec(pathname)?.[1],
+    () => /^\/chat\/([^/]+)\/?$/.exec(pathname)?.[1],
     [pathname],
   );
 
   const handleThreadChange = React.useCallback(
     (id: string | undefined) => {
       if (!id) {
-        if (pathname !== "/") router.push("/");
+        if (pathname !== "/chat") router.push("/chat");
         return;
       }
-      const target = `/c/${id}`;
+      const target = `/chat/${id}`;
       if (pathname === target) return;
       // The first message mints the thread while the URL is still `/`: replace
       // so Back doesn't land on the now-used empty composer.
-      if (pathname === "/") router.replace(target);
+      if (pathname === "/chat") router.replace(target);
       else router.push(target);
     },
     [pathname, router],

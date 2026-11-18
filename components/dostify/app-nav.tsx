@@ -6,7 +6,7 @@ import { ChatCircleIcon, NotebookIcon, PlugsConnectedIcon, type Icon } from "@ph
 import { cn } from "@/lib/utils";
 
 const LINKS: { href: string; label: string; icon: Icon }[] = [
-  { href: "/", label: "Chat", icon: ChatCircleIcon },
+  { href: "/chat", label: "Chat", icon: ChatCircleIcon },
   { href: "/journal", label: "Journal", icon: NotebookIcon },
   { href: "/connectors", label: "Connectors", icon: PlugsConnectedIcon },
 ];
@@ -14,9 +14,8 @@ const LINKS: { href: string; label: string; icon: Icon }[] = [
 /** The sidebar's main navigation. */
 export function AppNav({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname();
-  // "/" and "/c/<id>" are both the chat.
-  const isActive = (href: string) =>
-    href === "/" ? pathname === "/" || pathname.startsWith("/c/") : pathname.startsWith(href);
+  // "/chat" and "/chat/<id>" are both the chat.
+  const isActive = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
 
   return (
     <nav className="flex flex-col gap-1" aria-label="Main">

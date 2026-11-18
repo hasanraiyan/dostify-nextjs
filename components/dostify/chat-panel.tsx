@@ -15,7 +15,7 @@ export function ChatPanel({ onNavigate }: { onNavigate?: () => void }) {
   const [stalled, setStalled] = useStalledFlag(threads?.isLoading ?? false);
 
   if (!threads) return null;
-  const activeThreadId = /^\/c\/([^/]+)\/?$/.exec(pathname)?.[1];
+  const activeThreadId = /^\/chat\/([^/]+)\/?$/.exec(pathname)?.[1];
 
   return (
     <>
@@ -29,10 +29,10 @@ export function ChatPanel({ onNavigate }: { onNavigate?: () => void }) {
         }}
         activeThreadId={activeThreadId}
         onSelect={(id) => {
-          router.push(`/c/${id}`);
+          router.push(`/chat/${id}`);
           onNavigate?.();
         }}
-        onActiveThreadDeleted={() => router.push("/")}
+        onActiveThreadDeleted={() => router.push("/chat")}
         renameThread={threads.renameThread}
         deleteThread={threads.deleteThread}
       />

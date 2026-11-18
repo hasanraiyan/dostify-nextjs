@@ -75,7 +75,7 @@ export function AssistantExperience() {
           </div>
           <div className="flex items-center gap-3">
             <Link
-              href="/"
+              href="/chat"
               className={buttonVariants({ variant: "ghost", size: "sm" })}
             >
               Full chat
@@ -111,7 +111,7 @@ export function AssistantExperience() {
               Open the assistant
             </Button>
             <Link
-              href="/"
+              href="/chat"
               className={buttonVariants({ variant: "outline", size: "lg" })}
             >
               Open full chat

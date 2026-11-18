@@ -18,11 +18,11 @@ import { JournalPanel } from "./journal-panel";
 /** The one sidebar: nav on top, the current section's list below, account at the bottom. */
 function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname();
-  const inChat = pathname === "/" || pathname.startsWith("/c/");
+  const inChat = pathname === "/chat" || pathname.startsWith("/chat/");
   const inJournal = pathname.startsWith("/journal");
   // The header button creates whatever the open page is about.
   const action = inChat
-    ? { href: "/", label: "New chat" }
+    ? { href: "/chat", label: "New chat" }
     : inJournal
       ? { href: "/journal/new", label: "New entry" }
       : null;

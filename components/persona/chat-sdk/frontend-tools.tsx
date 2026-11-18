@@ -41,7 +41,7 @@ import { setThemePref } from "@/lib/dostify/theme";
 // router.push must not get untrusted URLs (a `javascript:` URL would run in
 // the page — see Next's useRouter docs), and tool arguments are untrusted.
 const PAGES = {
-  new_chat: { path: "/", label: "a new chat" },
+  new_chat: { path: "/chat", label: "a new chat" },
   assistant: { path: "/assistant", label: "the assistant showcase" },
   journal: { path: "/journal", label: "the journal" },
   connectors: { path: "/connectors", label: "the connectors page" },
