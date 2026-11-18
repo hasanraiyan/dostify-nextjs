@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import type { Metadata } from "next";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { prisma } from "@/lib/prisma";
+import { countEntries } from "@/lib/dostify/journal";
 import { getCurrentDbUser } from "@/lib/dostify/current-user";
 
 export const metadata: Metadata = { title: "Profile — Dostify" };
@@ -22,7 +22,7 @@ async function ProfileCard() {
   const user = await getCurrentDbUser();
   if (!user) return <p className="text-sm text-muted-foreground">Please sign in.</p>;
 
-  const journalEntries = await prisma.journalEntry.count({ where: { userId: user.id } });
+  const journalEntries = await countEntries(user.id);
   const since = user.createdAt.toLocaleDateString("en-IN", {
     timeZone: "Asia/Kolkata",
     day: "numeric",

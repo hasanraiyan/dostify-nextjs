@@ -2,6 +2,7 @@ import { z } from 'zod'
 import type { createMcpHandler } from 'mcp-handler'
 import { prisma } from '@/lib/prisma'
 import { syncClerkUser } from '@/lib/sync-user'
+import { countEntries, createEntry, listEntries } from '@/lib/dostify/journal'
 
 type McpServer = Parameters<Parameters<typeof createMcpHandler>[0]>[0]
 
@@ -50,7 +51,7 @@ export function registerDostifyTools(server: McpServer) {
       }),
     },
     tool(async (a: { text: string; mood?: number }, userId) => {
-      return prisma.journalEntry.create({ data: { userId, ...a } })
+      return createEntry(userId, a)
     }),
   )
 
@@ -62,11 +63,7 @@ export function registerDostifyTools(server: McpServer) {
       inputSchema: z.object({ limit: z.number().int().min(1).max(50).default(10) }),
     },
     tool(async (a: { limit: number }, userId) => {
-      return prisma.journalEntry.findMany({
-        where: { userId },
-        orderBy: { createdAt: 'desc' },
-        take: a.limit,
-      })
+      return listEntries(userId, a.limit)
     }),
   )
 
@@ -83,7 +80,7 @@ export function registerDostifyTools(server: McpServer) {
           where: { id: userId },
           select: { name: true, createdAt: true },
         }),
-        prisma.journalEntry.count({ where: { userId } }),
+        countEntries(userId),
       ])
       return { name: user.name, memberSince: user.createdAt, journalEntries }
     }),
