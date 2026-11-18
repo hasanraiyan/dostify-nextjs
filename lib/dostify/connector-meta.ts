@@ -33,6 +33,42 @@ export const CONNECTORS: ConnectorMeta[] = [
     description: 'Previous year question papers and study material.',
     icon: '/connectors/pyqdeck.png',
   },
+  {
+    match: ['deepwiki'],
+    name: 'DeepWiki',
+    description: 'Ask questions about any public GitHub repository and read its documentation.',
+    icon: '/connectors/deepwiki.png',
+  },
+  {
+    match: ['notion'],
+    name: 'Notion',
+    description: 'Read and write your Notion pages and notes.',
+    icon: '/connectors/notion.png',
+  },
+  {
+    match: ['linear'],
+    name: 'Linear',
+    description: 'Look up and manage issues and projects.',
+    icon: '/connectors/linear.png',
+  },
+  {
+    match: ['sentry'],
+    name: 'Sentry',
+    description: 'Investigate errors and crashes in your apps.',
+    icon: '/connectors/sentry.png',
+  },
+  {
+    match: ['atlassian'],
+    name: 'Atlassian',
+    description: 'Search and update Jira issues and Confluence pages.',
+    icon: '/connectors/atlassian.png',
+  },
+  {
+    match: ['roundtable'],
+    name: 'Roundtable',
+    description: 'Get code reviews and design advice from a panel of AI models.',
+    icon: '/connectors/roundtable.png',
+  },
 ]
 
 /** Lowercase and drop everything but letters and digits, so naming style doesn't matter. */

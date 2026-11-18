@@ -1,6 +1,6 @@
 # Dostify: MCP servers to add in Persona
 
-Checklist of the MCP servers to register on the Persona website and attach to the Dostify agent. URLs and auth types were probed with a live `initialize` request on 2026-11-18 (see "How this was checked"), but Persona itself has not connected to them yet, so confirm each one when you add it.
+Checklist of the MCP servers to register on the Persona website and attach to the Dostify agent. **Already added in Persona (2026-11-18):** `pyqdeck_mcp`, `deepwiki`, `notion`, `linear`, `sentry`, `atlassian`, `roundtable`. **Still to add:** `dostify` (our own). URLs and auth types were probed with a live `initialize` request on 2026-11-18 (see "How this was checked"), but Persona itself has not connected to them yet, so confirm each one when you add it.
 
 ## How to add one
 
@@ -23,7 +23,7 @@ If the form asks for an OAuth client ID and secret, try leaving them empty first
 
 ---
 
-## 1. Add now
+## 1. Add now (`dostify` is still to do)
 
 ### Dostify (our own MCP)
 
@@ -55,7 +55,7 @@ Icon and friendly name are already set in `lib/dostify/connector-meta.ts`.
 
 ## 2. For testing
 
-### DeepWiki: no login (best first test)
+### DeepWiki: no login (best first test) - added
 
 | | |
 |---|---|
@@ -68,7 +68,7 @@ Icon and friendly name are already set in `lib/dostify/connector-meta.ts`.
 
 Try: "Tell me about the vercel/next.js repo." Confirms that a new connector's tools reach the chat and render as the normal tool card.
 
-### Notion: OAuth (best second test)
+### Notion: OAuth (best second test) - added
 
 | | |
 |---|---|
@@ -82,7 +82,7 @@ Tests the full connect round trip on `/connectors`. Not confirmed: whether Perso
 
 ---
 
-## 3. Optional (developer tools, not a fit for Dostify's audience)
+## 3. Optional (developer tools, not a fit for Dostify's audience) - all added
 
 | Name | URL | Auth | What it is |
 |---|---|---|---|
@@ -110,26 +110,13 @@ Possible tools on our own MCP, in the `manage_journal` style (one tool, an `acti
 
 ---
 
-## Connector display (optional)
+## Connector display
 
-To give a connector a logo, a friendly name and a description on the Connectors page, add an entry to `lib/dostify/connector-meta.ts`. `match` is the Persona name (case and punctuation are ignored):
+`lib/dostify/connector-meta.ts` gives each connector a logo, a friendly name and a description on the Connectors page. Entries exist for `pyqdeck_mcp`, `deepwiki`, `notion`, `linear`, `sentry`, `atlassian` and `roundtable`; the icons are in `public/connectors/` (128px PNGs from each product's own site or GitHub avatar). `match` is the name used in Persona (case and punctuation are ignored), so if a connector is registered under a different name, add that name to its `match` list.
 
-```ts
-{
-  match: ['deepwiki'],
-  name: 'DeepWiki',
-  description: 'Ask questions about any public GitHub repository.',
-  icon: '/connectors/deepwiki.png', // file in public/connectors/
-},
-{
-  match: ['notion'],
-  name: 'Notion',
-  description: 'Read and write your Notion pages and notes.',
-  icon: '/connectors/notion.png',
-},
-```
+No-auth connectors (`deepwiki`, `roundtable`) do not appear on `/connectors`, because there is nothing to connect; only user-mode OAuth ones do. Their tools still reach the agent.
 
-No-auth connectors do not appear on `/connectors` (nothing to connect); only user-mode OAuth ones do.
+To add another, copy an entry and drop a square image into `public/connectors/`.
 
 ---
 
