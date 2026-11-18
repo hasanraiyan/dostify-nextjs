@@ -9,6 +9,8 @@ const PUBLIC_PREFIXES = [
   "/sign-in",
   "/sign-up",
   "/sso-callback",
+  "/native-auth/complete",
+  "/api/native-auth",
   "/.well-known",
   "/api/webhooks",
   "/api/health",
