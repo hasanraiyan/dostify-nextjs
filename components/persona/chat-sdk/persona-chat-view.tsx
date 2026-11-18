@@ -207,6 +207,8 @@ export interface PersonaChatViewProps extends UsePersonaChatWidgetOptions {
   headerActions?: React.ReactNode;
   /** Extra controls at the start of the main header (e.g. an app menu button). */
   headerLeading?: React.ReactNode;
+  /** On an empty new chat, centre the composer vertically instead of pinning it to the bottom. @default false */
+  centerComposerWhenEmpty?: boolean;
   /**
    * CSS custom properties that override this app's shadcn tokens for just
    * this view (`--primary`, `--radius`, `--background`, …) — every visual
@@ -300,6 +302,7 @@ export function PersonaChatView({
   showTerminal = true,
   headerActions,
   headerLeading,
+  centerComposerWhenEmpty = false,
   theme,
   classNames = {},
   components = {},
@@ -374,7 +377,10 @@ export function PersonaChatView({
   });
 
   const { pack: avatarPack, avatarId } = useAvatarPref();
-  const callDuration = useCallTimer(isVoiceActive);
+  // Counts from 00:00 only once the call is actually connected, not while it dials.
+  const callDuration = useCallTimer(
+    voice.state === "listening" || voice.state === "thinking" || voice.state === "speaking",
+  );
   const inViewAvatarRef = React.useRef<Avatar | null>(null);
 
   const handleEndCallWithGoodbye = React.useCallback(() => {
@@ -484,6 +490,14 @@ export function PersonaChatView({
   };
 
   const showThreads = layout === "sidebar-main" && showThreadList;
+  // Empty new chat with nothing else to show: the composer takes the middle.
+  const centerComposer =
+    centerComposerWhenEmpty &&
+    showComposer &&
+    !isLoadingHistory &&
+    messages.length === 0 &&
+    !isVoiceActive &&
+    !emptyState;
   // Below `md` the thread list moves into a slide-over sheet; this tracks it.
   const [threadsOpen, setThreadsOpen] = React.useState(false);
   // Desktop-only collapse; the mobile sheet has its own dismiss.
@@ -724,7 +738,7 @@ export function PersonaChatView({
               <Spinner className="size-5 text-muted-foreground" />
             </div>
           )
-        ) : messages.length === 0 && !isVoiceActive && (emptyState || emptyTitle || emptyDescription || (starterPrompts && starterPrompts.length > 0)) ? (
+        ) : centerComposer ? null : messages.length === 0 && !isVoiceActive && (emptyState || emptyTitle || emptyDescription || (starterPrompts && starterPrompts.length > 0)) ? (
           emptyState ?? (
             <EmptyStateComponent
               title={emptyTitle}
@@ -778,9 +792,24 @@ export function PersonaChatView({
             className={cn(
               // Keep the composer clear of the iOS home indicator.
               "mx-auto w-full max-w-3xl shrink-0 px-3 pb-[max(1rem,env(safe-area-inset-bottom))] sm:px-4",
+              // Empty chat: the free space splits evenly above and below.
+              centerComposer && "my-auto",
               classNames.composer
             )}
           >
+            {/* Empty chat: the greeting sits right above the centred composer. */}
+            {centerComposer && (emptyTitle || emptyDescription) && (
+              <div className="mb-6 flex flex-col items-center gap-1 text-center">
+                {emptyTitle && (
+                  <h2 className="font-heading text-2xl font-semibold tracking-tight sm:text-3xl">
+                    {emptyTitle}
+                  </h2>
+                )}
+                {emptyDescription && (
+                  <p className="text-sm text-muted-foreground">{emptyDescription}</p>
+                )}
+              </div>
+            )}
             {/* Compact voice dock when minimized */}
             {voiceDockVisible && isVoiceActive && onVoiceDockExpand && (
               <VoiceDock

@@ -64,6 +64,7 @@ export function ChatShell({ children }: { children: React.ReactNode }) {
           onThreadChange={handleThreadChange}
           title="Dostify"
           showThreadList={false}
+          centerComposerWhenEmpty
           headerLeading={
             <Button
               type="button"
