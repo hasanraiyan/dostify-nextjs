@@ -38,7 +38,7 @@ function InterruptPanel({
 }) {
   if (interrupt.kind === "hitl") {
     return (
-      <div className="flex flex-col gap-2 rounded-none border border-border bg-card p-3">
+      <div className="flex flex-col gap-2 rounded-lg border border-border bg-card p-3">
         <div className="text-xs font-semibold text-muted-foreground">
           Waiting for your approval to continue
         </div>
@@ -108,7 +108,7 @@ function InterruptPanel({
   };
 
   return (
-    <div className="rounded-none border border-border bg-card p-3">
+    <div className="rounded-lg border border-border bg-card p-3">
       <Questionnaire
         items={questions.map((q) => ({
           name: q.id,

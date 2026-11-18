@@ -62,7 +62,7 @@ export function ReadFileCard({ toolCall }: { toolCall: PersonaToolCall }) {
 
   if (!details) {
     return (
-      <pre className="max-h-56 overflow-auto whitespace-pre-wrap break-words font-mono text-xs leading-5 text-foreground bg-muted p-2.5 rounded-none border border-border">
+      <pre className="max-h-56 overflow-auto whitespace-pre-wrap break-words font-mono text-xs leading-5 text-foreground bg-muted p-2.5 rounded-lg border border-border">
         {toolCall.result || "No result yet."}
       </pre>
     );
@@ -74,7 +74,7 @@ export function ReadFileCard({ toolCall }: { toolCall: PersonaToolCall }) {
   const done = toolCallStatus(toolCall) !== "running";
 
   return (
-    <div className="flex flex-col rounded-none border border-border bg-card overflow-hidden">
+    <div className="flex flex-col rounded-lg border border-border bg-card overflow-hidden">
       <div className="flex items-center justify-between border-b border-border bg-muted/50 px-3 py-2">
         <div className="flex items-center gap-2 min-w-0">
           <FileIcon className="size-4 shrink-0 text-muted-foreground" />

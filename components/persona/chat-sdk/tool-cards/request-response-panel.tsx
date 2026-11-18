@@ -55,7 +55,7 @@ export function RequestResponsePanel({
       </div>
       <div
         className={cn(
-          "max-h-40 overflow-auto rounded-none border p-2",
+          "max-h-40 overflow-auto rounded-lg border p-2",
           isError ? "border-destructive/30 bg-destructive/10" : "border-border bg-muted",
           className
         )}

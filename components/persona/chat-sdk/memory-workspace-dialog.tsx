@@ -172,7 +172,7 @@ export function MemoryWorkspaceDialog({
         renderTabExtras={(item, activePath) => {
           if (item.id === "workspace") {
             return (
-              <Badge variant="outline" className="rounded-none bg-muted/50 px-1.5 py-0 font-mono text-[10px] uppercase tracking-wide">
+              <Badge variant="outline" className="rounded-lg bg-muted/50 px-1.5 py-0 font-mono text-[10px] uppercase tracking-wide">
                 <span className="inline-flex items-center gap-1">
                   <FolderOpenIcon className="size-2.5 text-primary" />
                   Workspace
@@ -182,7 +182,7 @@ export function MemoryWorkspaceDialog({
           }
           const isShared = activePath?.startsWith("user/") ?? false;
           return (
-            <Badge variant="outline" className="rounded-none bg-muted/50 px-1.5 py-0 font-mono text-[10px] uppercase tracking-wide">
+            <Badge variant="outline" className="rounded-lg bg-muted/50 px-1.5 py-0 font-mono text-[10px] uppercase tracking-wide">
               {isShared ? (
                 <span className="inline-flex items-center gap-1">
                   <SparkleIcon className="size-2.5 text-primary" />
@@ -211,7 +211,7 @@ export function MemoryWorkspaceDialog({
           <SheetHeader className="flex shrink-0 flex-row items-center justify-between border-b border-border bg-muted/20 px-4 py-3">
             <div className="flex flex-col gap-0.5">
               <SheetTitle className="flex items-center gap-2 text-sm font-semibold tracking-tight">
-                <span className="flex size-6 items-center justify-center rounded-none bg-primary text-primary-foreground">
+                <span className="flex size-6 items-center justify-center rounded-lg bg-primary text-primary-foreground">
                   <FolderOpenIcon className="size-3.5" />
                 </span>
                 Memory &amp; Workspace
@@ -233,7 +233,7 @@ export function MemoryWorkspaceDialog({
         <DialogHeader className="flex shrink-0 flex-row items-center justify-between border-b border-border bg-muted/20 px-5 py-3">
           <div className="flex flex-col gap-0.5">
             <DialogTitle className="flex items-center gap-2 text-sm font-semibold tracking-tight">
-              <span className="flex size-6 items-center justify-center rounded-none bg-primary text-primary-foreground">
+              <span className="flex size-6 items-center justify-center rounded-lg bg-primary text-primary-foreground">
                 <FolderOpenIcon className="size-3.5" />
               </span>
               Memory &amp; Workspace

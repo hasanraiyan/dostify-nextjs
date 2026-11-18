@@ -445,7 +445,7 @@ export function McpAppRenderer({
     return (
       <div
         className={cn(
-          "rounded-none border border-destructive/30 bg-destructive/10 p-4 text-destructive",
+          "rounded-lg border border-destructive/30 bg-destructive/10 p-4 text-destructive",
           className
         )}
       >

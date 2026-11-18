@@ -63,7 +63,7 @@ function TreeRow({ node, depth, collapsed, onToggle }: {
         variant="ghost"
         style={indent}
         onClick={() => onToggle(node.path)}
-        className="h-auto w-full min-w-0 justify-start gap-1 rounded-none py-1 pr-2 text-left text-xs font-normal text-muted-foreground"
+        className="h-auto w-full min-w-0 justify-start gap-1 rounded-lg py-1 pr-2 text-left text-xs font-normal text-muted-foreground"
       >
         {isOpen ? <CaretDownIcon className="size-3 shrink-0" /> : <CaretRightIcon className="size-3 shrink-0" />}
         {isOpen ? <FolderOpenIcon className="size-3.5 shrink-0" /> : <FolderIcon className="size-3.5 shrink-0" />}
@@ -109,7 +109,7 @@ export function LsDirectoryCard({ toolCall }: { toolCall: PersonaToolCall }) {
         type="button"
         variant="ghost"
         onClick={() => setOpen((v) => !v)}
-        className="h-auto w-full min-w-0 justify-start gap-1.5 rounded-none bg-muted/10 px-2 py-1.5 text-left text-[11px] font-semibold uppercase tracking-wider text-muted-foreground"
+        className="h-auto w-full min-w-0 justify-start gap-1.5 rounded-lg bg-muted/10 px-2 py-1.5 text-left text-[11px] font-semibold uppercase tracking-wider text-muted-foreground"
       >
         {open ? <CaretDownIcon className="size-3 shrink-0" /> : <CaretRightIcon className="size-3 shrink-0" />}
         {open ? <FolderOpenIcon className="size-3.5 shrink-0" /> : <FolderIcon className="size-3.5 shrink-0" />}

@@ -52,7 +52,7 @@ function MessageMarkdown({
         // token colors from the `code` plugin); adding another border/bg/
         // padding layer around its <pre>/<code> just nests boxes inside
         // boxes.
-        "[&_code:not(pre_code)]:rounded-none [&_code:not(pre_code)]:bg-muted [&_code:not(pre_code)]:px-1 [&_code:not(pre_code)]:py-0.5 [&_code:not(pre_code)]:text-xs",
+        "[&_code:not(pre_code)]:rounded-lg [&_code:not(pre_code)]:bg-muted [&_code:not(pre_code)]:px-1 [&_code:not(pre_code)]:py-0.5 [&_code:not(pre_code)]:text-xs",
         "[&_h1]:mt-4 [&_h1]:mb-2 [&_h1]:text-sm [&_h1]:font-semibold",
         "[&_h2]:mt-4 [&_h2]:mb-2 [&_h2]:text-sm [&_h2]:font-semibold",
         "[&_h3]:mt-3 [&_h3]:mb-1.5 [&_h3]:text-xs [&_h3]:font-semibold",

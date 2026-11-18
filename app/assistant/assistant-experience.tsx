@@ -66,7 +66,7 @@ export function AssistantExperience() {
       <main className="relative flex min-h-dvh flex-col bg-background">
         <header className="flex h-14 shrink-0 items-center justify-between border-b border-border px-4 sm:px-6">
           <div className="flex items-center gap-2">
-            <span className="flex size-7 items-center justify-center rounded-none bg-primary text-primary-foreground">
+            <span className="flex size-7 items-center justify-center rounded-lg bg-primary text-primary-foreground">
               <SparkleIcon weight="fill" className="size-4" />
             </span>
             <span className="font-heading text-sm font-semibold tracking-tight">

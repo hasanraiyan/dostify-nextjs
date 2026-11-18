@@ -81,7 +81,7 @@ export function DiffView({
   let newNo = 1;
 
   return (
-    <div className="flex flex-col rounded-none border border-border bg-card overflow-hidden">
+    <div className="flex flex-col rounded-lg border border-border bg-card overflow-hidden">
       {fileName ? (
         <div className="flex items-center justify-between border-b border-border bg-muted/50 px-3 py-2">
           <div className="flex min-w-0 items-center gap-2">

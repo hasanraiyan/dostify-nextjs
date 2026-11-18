@@ -12,6 +12,7 @@ import {
 } from "@phosphor-icons/react";
 import { Spinner } from "@/components/ui/spinner";
 import type { PersonaAttachment } from "@personaai/react";
+import { cn } from "@/lib/utils";
 import { InputGroup, InputGroupTextarea, InputGroupAddon, InputGroupButton } from "@/components/ui/input-group";
 
 function formatFileSize(bytes: number): string {
@@ -73,7 +74,7 @@ function VoiceModeIcon(props: React.SVGProps<SVGSVGElement>) {
  *
  * Deliberately no custom rounding/background overrides here — `InputGroup`/
  * `InputGroupButton` already carry this app's actual look (sharp
- * `rounded-none` everywhere, `Button`'s own variant colors), stacking a
+ * `rounded-lg` everywhere, `Button`'s own variant colors), stacking a
  * borrowed rounded-pill/rounded-full treatment on top of them is exactly
  * what looked inconsistent and over-padded before.
  */
@@ -223,7 +224,7 @@ function ChatComposer({
         </div>
       )}
 
-      <InputGroup>
+      <InputGroup className="rounded-2xl">
         {!isVoiceActive && attachments && attachments.length > 0 && (
           <InputGroupAddon align="block-start" className="flex-wrap gap-2 pb-2 pt-1">
             {attachments.map((att) => (
@@ -338,7 +339,13 @@ function ChatComposer({
             ) : isVoiceActive ? (
               <div className="flex items-center gap-1.5">
                 {trimmed ? (
-                  <InputGroupButton type="submit" variant="default" size="icon-sm" aria-label="Send to voice">
+                  <InputGroupButton
+                    type="submit"
+                    variant="default"
+                    size="icon-sm"
+                    aria-label="Send to voice"
+                    className="rounded-full"
+                  >
                     <ArrowUpIcon />
                   </InputGroupButton>
                 ) : null}
@@ -370,7 +377,7 @@ function ChatComposer({
                 aria-label="Send message"
                 // Dim but not natively disabled (see note above): pointer-events
                 // off so an empty click no-ops and focuses the field instead.
-                className={canSend ? undefined : "pointer-events-none opacity-40"}
+                className={cn("rounded-full", !canSend && "pointer-events-none opacity-40")}
               >
                 {isUploadingAttachments ? <Spinner className="size-3.5" /> : <ArrowUpIcon />}
               </InputGroupButton>

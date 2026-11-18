@@ -47,7 +47,7 @@ export function McpConnectBanner({
       role="status"
       aria-live="polite"
       className={cn(
-        "overflow-hidden rounded-none border border-border bg-card text-xs",
+        "overflow-hidden rounded-lg border border-border bg-card text-xs",
         className
       )}
     >

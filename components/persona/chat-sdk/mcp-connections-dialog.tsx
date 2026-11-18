@@ -230,7 +230,7 @@ export function McpConnectionsDialog({
           <SheetHeader className="flex shrink-0 flex-row items-center justify-between border-b border-border bg-muted/20 px-4 py-3">
             <div className="flex flex-col gap-0.5">
               <SheetTitle className="flex items-center gap-2 text-sm font-semibold tracking-tight">
-                <span className="flex size-6 items-center justify-center rounded-none bg-primary text-primary-foreground">
+                <span className="flex size-6 items-center justify-center rounded-lg bg-primary text-primary-foreground">
                   <KeyIcon className="size-3.5" />
                 </span>
                 Connected accounts
@@ -252,7 +252,7 @@ export function McpConnectionsDialog({
         <DialogHeader className="flex shrink-0 flex-row items-center justify-between border-b border-border bg-muted/20 px-5 py-3">
           <div className="flex min-w-0 flex-col gap-0.5">
             <DialogTitle className="flex items-center gap-2 text-sm font-semibold tracking-tight">
-              <span className="flex size-6 items-center justify-center rounded-none bg-primary text-primary-foreground">
+              <span className="flex size-6 items-center justify-center rounded-lg bg-primary text-primary-foreground">
                 <KeyIcon className="size-3.5" />
               </span>
               Connected accounts

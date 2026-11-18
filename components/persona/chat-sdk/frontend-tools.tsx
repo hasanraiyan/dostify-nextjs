@@ -41,6 +41,8 @@ import { BreathingExercise, HelplineCard } from "./dostify-widgets";
 const PAGES = {
   new_chat: { path: "/", label: "a new chat" },
   assistant: { path: "/assistant", label: "the assistant showcase" },
+  journal: { path: "/journal", label: "the journal" },
+  profile: { path: "/profile", label: "the profile" },
 } as const;
 type PageKey = keyof typeof PAGES;
 
@@ -206,7 +208,7 @@ export function PersonaFrontendTools() {
   useFrontendTool<{ page: PageKey }>({
     name: "navigate_to",
     description:
-      'Open a page of this app for the user. "new_chat" starts a fresh conversation; "assistant" opens the assistant feature showcase.',
+      'Open a page of this app for the user. "new_chat" starts a fresh conversation; "journal" opens the mood journal; "profile" opens the profile; "assistant" opens the assistant feature showcase.',
     parameters: {
       type: "object",
       properties: { page: { type: "string", enum: Object.keys(PAGES) } },

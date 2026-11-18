@@ -661,7 +661,7 @@ export function PersonaChatView({
                       cancelRename();
                     }
                   }}
-                  className="min-w-0 flex-1 rounded-sm border border-input bg-background px-2 py-1 text-sm outline-none focus-visible:border-ring focus-visible:ring-1 focus-visible:ring-ring/50"
+                  className="min-w-0 flex-1 rounded-md border border-input bg-background px-2 py-1 text-sm outline-none focus-visible:border-ring focus-visible:ring-1 focus-visible:ring-ring/50"
                 />
               ) : (
                 <>
@@ -773,9 +773,8 @@ export function PersonaChatView({
       {showThreads && !threadListOverlay && !appSplit && (!threadListCollapsible || !threadsCollapsed) && (
         <div
           className={cn(
-            "hidden h-full w-64 min-h-0 shrink-0 flex-col overflow-hidden bg-card md:flex",
-            threadListSide === "right" ? "border-l" : "border-r",
-            "border-border",
+            // Floating rounded panel instead of a flush full-height column.
+            "m-2 hidden h-[calc(100%-1rem)] w-64 min-h-0 shrink-0 flex-col overflow-hidden rounded-2xl border border-border bg-card md:flex",
             classNames.threadList
           )}
         >
@@ -788,7 +787,7 @@ export function PersonaChatView({
           <SheetContent
             side="left"
             showCloseButton={false}
-            className="flex h-full min-h-0 flex-col overflow-hidden p-0 data-[side=left]:w-72 data-[side=left]:max-w-[85vw]"
+            className="flex h-full min-h-0 flex-col overflow-hidden rounded-r-2xl p-0 data-[side=left]:w-72 data-[side=left]:max-w-[85vw]"
           >
             <SheetHeader className="sr-only">
               <SheetTitle>Chats</SheetTitle>

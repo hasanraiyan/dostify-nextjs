@@ -1,11 +1,20 @@
 "use client";
 
 import * as React from "react";
+import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { PersonaProvider } from "@personaai/react";
 import { UserButton, useUser } from "@clerk/nextjs";
-import { ChatCircleIcon, HeartIcon, ListChecksIcon, TimerIcon } from "@phosphor-icons/react";
-import { PersonaChatView, PersonaFrontendTools } from "@/components/persona/chat-sdk";
+import {
+  ChatCircleIcon,
+  HeartIcon,
+  ListChecksIcon,
+  TimerIcon,
+} from "@phosphor-icons/react";
+import {
+  PersonaChatView,
+  PersonaFrontendTools,
+} from "@/components/persona/chat-sdk";
 import { AGENTS, DEFAULT_VOICE_AGENT_ID } from "@/app/agents";
 
 /**
@@ -19,17 +28,33 @@ function AccountFooter() {
   if (!user) return null;
 
   return (
-    <div className="flex items-center gap-2 p-2">
-      <UserButton appearance={{ elements: { avatarBox: "size-8" } }} />
-      <div className="min-w-0 flex-1">
-        <p className="truncate text-xs font-medium">
-          {user.fullName || user.username || "Signed in"}
-        </p>
-        {user.primaryEmailAddress && (
-          <p className="truncate text-[11px] text-muted-foreground">
-            {user.primaryEmailAddress.emailAddress}
+    <div className="flex flex-col gap-1 p-2">
+      <div className="flex gap-1">
+        {[
+          { href: "/journal", label: "Journal" },
+          { href: "/profile", label: "Profile" },
+        ].map(({ href, label }) => (
+          <Link
+            key={href}
+            href={href}
+            className="flex-1 rounded-full bg-muted px-3 py-1.5 text-center text-xs font-medium transition-colors hover:bg-accent"
+          >
+            {label}
+          </Link>
+        ))}
+      </div>
+      <div className="flex items-center gap-2 pt-1">
+        <UserButton appearance={{ elements: { avatarBox: "size-8" } }} />
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-xs font-medium">
+            {user.fullName || user.username || "Signed in"}
           </p>
-        )}
+          {user.primaryEmailAddress && (
+            <p className="truncate text-[11px] text-muted-foreground">
+              {user.primaryEmailAddress.emailAddress}
+            </p>
+          )}
+        </div>
       </div>
     </div>
   );
@@ -39,7 +64,10 @@ export function ChatShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
 
-  const threadId = React.useMemo(() => /^\/c\/([^/]+)\/?$/.exec(pathname)?.[1], [pathname]);
+  const threadId = React.useMemo(
+    () => /^\/c\/([^/]+)\/?$/.exec(pathname)?.[1],
+    [pathname],
+  );
 
   const handleThreadChange = React.useCallback(
     (id: string | undefined) => {
@@ -54,7 +82,7 @@ export function ChatShell({ children }: { children: React.ReactNode }) {
       if (pathname === "/") router.replace(target);
       else router.push(target);
     },
-    [pathname, router]
+    [pathname, router],
   );
 
   return (
@@ -71,7 +99,10 @@ export function ChatShell({ children }: { children: React.ReactNode }) {
       <div className="h-dvh w-full">
         <PersonaChatView
           agentId={AGENTS[0].agentId}
-          voiceAgentId={process.env.NEXT_PUBLIC_PERSONA_VOICE_AGENT_ID || DEFAULT_VOICE_AGENT_ID}
+          voiceAgentId={
+            process.env.NEXT_PUBLIC_PERSONA_VOICE_AGENT_ID ||
+            DEFAULT_VOICE_AGENT_ID
+          }
           voiceEnvironment="production"
           agents={AGENTS}
           threadId={threadId}
@@ -82,10 +113,26 @@ export function ChatShell({ children }: { children: React.ReactNode }) {
           emptyTitle="Kya chal raha hai, dost?"
           emptyDescription="Baat kar, vent kar, ya kaam bata. Tasks, focus aur reminders main sambhal lunga."
           starterPrompts={[
-            { label: "Aaj ka plan bana de", icon: ListChecksIcon, template: "Aaj ka plan bana de" },
-            { label: "Bahut stress hai", icon: HeartIcon, template: "Yaar bahut stress hai, baat karni hai" },
-            { label: "Focus session shuru kar", icon: TimerIcon, template: "25 minute ka focus session shuru kar" },
-            { label: "Tu kya kya kar sakta hai?", icon: ChatCircleIcon, template: "Tu kya kya kar sakta hai?" },
+            {
+              label: "Aaj ka plan bana de",
+              icon: ListChecksIcon,
+              template: "Aaj ka plan bana de",
+            },
+            {
+              label: "Bahut stress hai",
+              icon: HeartIcon,
+              template: "Yaar bahut stress hai, baat karni hai",
+            },
+            {
+              label: "Focus session shuru kar",
+              icon: TimerIcon,
+              template: "25 minute ka focus session shuru kar",
+            },
+            {
+              label: "Tu kya kya kar sakta hai?",
+              icon: ChatCircleIcon,
+              template: "Tu kya kya kar sakta hai?",
+            },
           ]}
         />
       </div>

@@ -239,12 +239,12 @@ function AgentUpsertBody({ summary }: { summary: AgentUpsertSummary }) {
           "…") already says this is in progress; a second "Writing agent
           configuration…" line under it was the same information twice. */}
       {isError ? (
-        <div className="flex items-start gap-2 rounded-none border border-destructive/30 bg-destructive/10 px-3 py-2 text-xs text-destructive">
+        <div className="flex items-start gap-2 rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-xs text-destructive">
           <WarningCircleIcon className="mt-0.5 size-3.5 shrink-0" />
           <span>{message || "Failed to save the agent configuration."}</span>
         </div>
       ) : succeeded ? (
-        <div className="flex items-center gap-2 rounded-none border border-emerald-500/20 bg-emerald-500/15 px-3 py-2 text-xs text-emerald-700 dark:text-emerald-400">
+        <div className="flex items-center gap-2 rounded-lg border border-emerald-500/20 bg-emerald-500/15 px-3 py-2 text-xs text-emerald-700 dark:text-emerald-400">
           <CheckCircleIcon className="size-3.5 shrink-0 text-emerald-500" />
           <span>{message || `Agent ${isUpdate ? "updated" : "created"}.`}</span>
         </div>
@@ -333,7 +333,7 @@ function AgentUpsertBody({ summary }: { summary: AgentUpsertSummary }) {
             <FileTextIcon className="size-3.5" />
             Instructions
           </div>
-          <div className="max-h-40 overflow-y-auto rounded-none border border-border bg-muted/50 px-3 py-2">
+          <div className="max-h-40 overflow-y-auto rounded-lg border border-border bg-muted/50 px-3 py-2">
             <MessageMarkdown muted content={systemPrompt} />
           </div>
         </div>
