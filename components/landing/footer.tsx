@@ -19,6 +19,8 @@ const COLUMNS: { title: string; links: FooterLink[] }[] = [
     links: [
       { label: "Create account", href: "/sign-up" },
       { label: "Sign in", href: "/sign-in" },
+      { label: "Terms", href: "/terms" },
+      { label: "Privacy", href: "/privacy" },
     ],
   },
   {

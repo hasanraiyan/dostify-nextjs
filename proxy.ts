@@ -3,7 +3,7 @@ import { NextResponse, type NextRequest } from "next/server";
 
 // Public paths: the landing page and its SEO files, auth pages, auth API, and MCP/OAuth endpoints. The app itself (/chat, /journal,
 // /connectors, /profile) stays behind sign-in.
-const PUBLIC_EXACT = ["/", "/robots.txt", "/sitemap.xml", "/opengraph-image", "/twitter-image"];
+const PUBLIC_EXACT = ["/", "/robots.txt", "/sitemap.xml", "/terms", "/privacy", "/opengraph-image", "/twitter-image"];
 
 const PUBLIC_PREFIXES = [
   "/sign-in",
