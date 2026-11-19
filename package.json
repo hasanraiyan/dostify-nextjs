@@ -15,7 +15,10 @@
     "db:reset": "docker compose down -v && docker compose up -d",
     "db:migrate": "prisma migrate dev",
     "db:generate": "prisma generate",
-    "db:studio": "prisma studio"
+    "db:studio": "prisma studio",
+    "cap:sync": "cap sync android",
+    "cap:open": "cap open android",
+    "cap:run": "cap run android"
   },
   "dependencies": {
     "@base-ui/react": "^1.9.0",
