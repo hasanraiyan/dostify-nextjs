@@ -9,7 +9,7 @@ import type { CapacitorConfig } from "@capacitor/cli";
 const serverUrl = process.env.CAP_SERVER_URL ?? "https://dostify.hasanraiyan.me";
 
 const config: CapacitorConfig = {
-  appId: "me.hasanraiyan.dostify",
+  appId: "com.hasanraiyan.dostify",
   appName: "Dostify",
   webDir: "mobile/www",
   server: {

@@ -1,4 +1,4 @@
-package me.hasanraiyan.dostify;
+package com.hasanraiyan.dostify;
 
 import com.getcapacitor.BridgeActivity;
 

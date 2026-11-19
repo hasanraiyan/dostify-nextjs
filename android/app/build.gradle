@@ -6,14 +6,14 @@ def keystoreFile = rootProject.file('keystore.properties')
 if (keystoreFile.exists()) { keystoreFile.withInputStream { keystoreProps.load(it) } }
 
 android {
-    namespace = "me.hasanraiyan.dostify"
+    namespace = "com.hasanraiyan.dostify"
     compileSdk = rootProject.ext.compileSdkVersion
     defaultConfig {
-        applicationId "me.hasanraiyan.dostify"
+        applicationId "com.hasanraiyan.dostify"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 2
-        versionName "1.1.0"
+        versionCode 3
+        versionName "1.1.1"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
