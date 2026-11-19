@@ -26,8 +26,8 @@ export function BrandMark({ className = "size-8" }: { className?: string }) {
 
 /*
  * Split screen for sign-in and sign-up: the form on warm paper, a drifting
- * wall of what Dostify does on a dark panel. Colours are fixed (not themed) so Clerk's form,
- * which is styled with the same hex values, always matches the page.
+ * wall of what Dostify does on a dark panel. Colours are fixed (not themed) so the form
+ * always matches the page.
  */
 export function AuthShell({ title, subtitle, panelTitle, panelBody, children }: AuthShellProps) {
   return (
@@ -35,18 +35,6 @@ export function AuthShell({ title, subtitle, panelTitle, panelBody, children }: 
       className="grid min-h-dvh w-full font-sans antialiased lg:h-dvh lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] lg:overflow-hidden"
       style={{ background: BRAND.paper, color: BRAND.ink }}
     >
-      <style>{`
-        .cl-formFieldInput, .cl-socialButtonsBlockButton {
-          border: 1px solid #D9CBC2 !important;
-          box-shadow: none !important;
-        }
-        .cl-formFieldInput:focus, .cl-formFieldInput:focus-visible {
-          border-color: ${BRAND.coral} !important;
-          box-shadow: 0 0 0 3px rgba(217, 83, 43, 0.18) !important;
-        }
-        .cl-socialButtonsBlockButton:hover { background: ${BRAND.cream} !important; }
-      `}</style>
-
       <div className="flex min-h-dvh flex-col px-5 pt-6 sm:px-10 sm:pt-8 lg:h-dvh lg:min-h-0">
         <Link
           href="/"

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useClerk, useUser } from "@clerk/nextjs";
+import { signOut, useSession } from "@/lib/auth-client";
 import { DotsThreeVerticalIcon, SignOutIcon, UserIcon } from "@phosphor-icons/react";
 import { useRouter } from "next/navigation";
 import {
@@ -16,12 +16,12 @@ import {
  * opens the profile page; the three-dot menu has the same plus sign out.
  */
 export function AccountSummary({ onNavigate }: { onNavigate?: () => void }) {
-  const { user } = useUser();
-  const { signOut } = useClerk();
+  const { data: session } = useSession();
+  const user = session?.user;
   const router = useRouter();
   if (!user) return null;
 
-  const name = user.fullName || user.username || "Signed in";
+  const name = user.name || "Signed in";
 
   return (
     <div className="flex items-center gap-1">
@@ -32,12 +32,12 @@ export function AccountSummary({ onNavigate }: { onNavigate?: () => void }) {
         className="flex min-w-0 flex-1 items-center gap-2 rounded-xl p-1 text-left transition-colors hover:bg-muted"
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={user.imageUrl} alt="" className="size-8 shrink-0 rounded-full" />
+        <img src={user.image ?? "/icon.svg"} alt="" className="size-8 shrink-0 rounded-full" />
         <span className="min-w-0 flex-1">
           <span className="block truncate text-xs font-medium">{name}</span>
-          {user.primaryEmailAddress && (
+          {user.email && (
             <span className="block truncate text-[11px] text-muted-foreground">
-              {user.primaryEmailAddress.emailAddress}
+              {user.email}
             </span>
           )}
         </span>
@@ -66,7 +66,7 @@ export function AccountSummary({ onNavigate }: { onNavigate?: () => void }) {
           </DropdownMenuItem>
           <DropdownMenuItem
             variant="destructive"
-            onClick={() => void signOut({ redirectUrl: "/sign-in" })}
+            onClick={() => void signOut({ fetchOptions: { onSuccess: () => router.replace("/sign-in") } })}
           >
             <SignOutIcon className="size-3.5" />
             Sign out

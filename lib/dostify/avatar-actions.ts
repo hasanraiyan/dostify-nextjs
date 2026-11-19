@@ -1,17 +1,16 @@
 "use server";
 
-import { auth } from "@clerk/nextjs/server";
+import { getUserId } from "@/lib/session";
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { isValidAvatarId, type AvatarId } from "./avatar-config";
-import { syncClerkUser } from "@/lib/sync-user";
 
 export async function getUserAvatarChoice(): Promise<AvatarId> {
-  const { userId: clerkId } = await auth();
-  if (!clerkId) return "sakura";
+  const userId = await getUserId();
+  if (!userId) return "sakura";
 
   const user = await prisma.user.findUnique({
-    where: { clerkId },
+    where: { id: userId },
     select: { avatarChoice: true },
   });
 
@@ -22,8 +21,8 @@ export async function getUserAvatarChoice(): Promise<AvatarId> {
 }
 
 export async function saveUserAvatarChoice(avatarChoice: string) {
-  const { userId: clerkId } = await auth();
-  if (!clerkId) {
+  const userId = await getUserId();
+  if (!userId) {
     throw new Error("Unauthorized");
   }
 
@@ -31,14 +30,8 @@ export async function saveUserAvatarChoice(avatarChoice: string) {
     throw new Error(`Invalid avatar choice: ${avatarChoice}`);
   }
 
-  // Ensure DB user exists
-  const existing = await prisma.user.findUnique({ where: { clerkId } });
-  if (!existing) {
-    await syncClerkUser(clerkId);
-  }
-
   await prisma.user.update({
-    where: { clerkId },
+    where: { id: userId },
     data: { avatarChoice },
   });
 

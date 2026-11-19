@@ -1,6 +1,6 @@
 /**
  * Brand colours for places that cannot read the CSS variables: the social
- * preview image and Clerk's sign-in form. Everything else uses the theme.
+ * preview image. Everything else uses the theme.
  */
 export const BRAND = {
   coral: '#D9532B',

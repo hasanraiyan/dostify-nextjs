@@ -1,5 +1,4 @@
 import { prisma } from "@/lib/prisma";
-import { syncClerkUser } from "@/lib/sync-user";
 import {
   FREE_MONTHLY_MESSAGES,
   FREE_MONTHLY_VOICE_SECONDS,
@@ -16,10 +15,9 @@ export type UsageSummary = {
   voiceLimitSeconds: number;
 };
 
-async function dbUserId(clerkId: string): Promise<string | null> {
-  const existing = await prisma.user.findUnique({ where: { clerkId }, select: { id: true } });
-  if (existing) return existing.id;
-  return (await syncClerkUser(clerkId))?.id ?? null;
+async function dbUserId(userId: string): Promise<string | null> {
+  const existing = await prisma.user.findUnique({ where: { id: userId }, select: { id: true } });
+  return existing?.id ?? null;
 }
 
 function callSeconds(startedAt: Date, endedAt: Date | null, now: Date) {
@@ -29,8 +27,8 @@ function callSeconds(startedAt: Date, endedAt: Date | null, now: Date) {
 }
 
 /** This month's usage for the signed-in user. */
-export async function getUsageSummary(clerkId: string): Promise<UsageSummary | null> {
-  const userId = await dbUserId(clerkId);
+export async function getUsageSummary(authUserId: string): Promise<UsageSummary | null> {
+  const userId = await dbUserId(authUserId);
   if (!userId) return null;
   const now = new Date();
   const month = monthKeyIST(now);
@@ -53,18 +51,18 @@ export async function getUsageSummary(clerkId: string): Promise<UsageSummary | n
   };
 }
 
-export async function messagesLeft(clerkId: string): Promise<boolean> {
-  const s = await getUsageSummary(clerkId);
+export async function messagesLeft(authUserId: string): Promise<boolean> {
+  const s = await getUsageSummary(authUserId);
   return !s || s.messages < s.messageLimit;
 }
 
-export async function voiceLeft(clerkId: string): Promise<boolean> {
-  const s = await getUsageSummary(clerkId);
+export async function voiceLeft(authUserId: string): Promise<boolean> {
+  const s = await getUsageSummary(authUserId);
   return !s || s.voiceSeconds < s.voiceLimitSeconds;
 }
 
-export async function recordMessage(clerkId: string) {
-  const userId = await dbUserId(clerkId);
+export async function recordMessage(authUserId: string) {
+  const userId = await dbUserId(authUserId);
   if (!userId) return;
   const month = monthKeyIST();
   await prisma.usageMonthly.upsert({
@@ -75,8 +73,8 @@ export async function recordMessage(clerkId: string) {
 }
 
 /** The browser reports the call connected. Any call left open is closed first. */
-export async function startVoiceSession(clerkId: string) {
-  const userId = await dbUserId(clerkId);
+export async function startVoiceSession(authUserId: string) {
+  const userId = await dbUserId(authUserId);
   if (!userId) return;
   const now = new Date();
   await prisma.voiceSession.updateMany({
@@ -87,8 +85,8 @@ export async function startVoiceSession(clerkId: string) {
 }
 
 /** The browser reports the call ended. */
-export async function endVoiceSession(clerkId: string) {
-  const userId = await dbUserId(clerkId);
+export async function endVoiceSession(authUserId: string) {
+  const userId = await dbUserId(authUserId);
   if (!userId) return;
   await prisma.voiceSession.updateMany({
     where: { userId, endedAt: null },

@@ -5,14 +5,17 @@ allowBuilds:
   prisma: true
   unrs-resolver: true
 minimumReleaseAgeExclude:
-  - '@personaai/adapters@0.16.0'
-  - '@personaai/adapters@0.18.0'
+  - '@personaai/adapters@0.16.0 || 0.18.0'
   - '@personaai/avatar@0.3.1'
-  - '@personaai/react@0.28.0'
-  - '@personaai/react@0.30.0'
-  - '@personaai/react@0.31.0'
-  - '@personaai/react@0.31.7'
-  - '@personaai/runtime@0.26.0'
-  - '@personaai/runtime@0.27.0'
-  - '@personaai/sdk@0.29.0'
-  - '@personaai/sdk@0.32.0'
+  - '@personaai/react@0.28.0 || 0.30.0 || 0.31.0 || 0.31.7'
+  - '@personaai/runtime@0.26.0 || 0.27.0'
+  - '@personaai/sdk@0.29.0 || 0.32.0'
+  - '@better-auth/core@1.7.26'
+  - '@better-auth/oauth-provider@1.7.26'
+  - '@better-auth/drizzle-adapter@1.7.26'
+  - '@better-auth/kysely-adapter@1.7.26'
+  - '@better-auth/memory-adapter@1.7.26'
+  - '@better-auth/mongo-adapter@1.7.26'
+  - '@better-auth/prisma-adapter@1.7.26'
+  - '@better-auth/telemetry@1.7.26'
+  - better-auth@1.7.26

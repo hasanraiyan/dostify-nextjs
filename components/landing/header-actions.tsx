@@ -1,17 +1,17 @@
 "use client";
 
-import { useAuth } from "@clerk/nextjs";
+import { useSession } from "@/lib/auth-client";
 import { CtaLink } from "./cta-link";
 
 /**
  * The header's right side. The page itself is static, so it starts as
- * "Sign in / Get started" and swaps to "Open Dostify" once Clerk knows the
+ * "Sign in / Get started" and swaps to "Open Dostify" once the session loads the
  * visitor is signed in.
  */
 export function HeaderActions() {
-  const { isLoaded, isSignedIn } = useAuth();
+  const { data: session } = useSession();
 
-  if (isLoaded && isSignedIn) {
+  if (session) {
     return <CtaLink href="/chat">Open Dostify</CtaLink>;
   }
   return (

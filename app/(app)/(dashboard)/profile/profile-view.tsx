@@ -2,7 +2,8 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { useClerk, useUser } from "@clerk/nextjs";
+import { signOut, useSession } from "@/lib/auth-client";
+import { useRouter } from "next/navigation";
 import {
   CaretRightIcon,
   GearSixIcon,
@@ -47,8 +48,10 @@ export function ProfileView({
   journalEntries: number;
   initialAvatar?: AvatarId;
 }) {
-  const { user, isLoaded } = useUser();
-  const { openUserProfile, signOut } = useClerk();
+  const router = useRouter();
+  const { data: session, isPending: isLoading } = useSession();
+  const user = session?.user;
+  const isLoaded = !isLoading;
   const [theme, setTheme] = useThemePref();
   const { avatarId, setAvatar } = useAvatarPref(initialAvatar);
   const [isPending, startTransition] = React.useTransition();
@@ -72,7 +75,7 @@ export function ProfileView({
   if (!isLoaded) return <Skeleton className="skeleton-shimmer h-32 animate-none rounded-2xl" />;
   if (!user) return <p className="text-sm text-muted-foreground">Please sign in.</p>;
 
-  const name = user.fullName || user.username || "Friend";
+  const name = user.name || "Friend";
 
   return (
     <>
@@ -84,28 +87,25 @@ export function ProfileView({
             <div className="flex items-end gap-4">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src={user.imageUrl}
+                src={user.image ?? "/icon.svg"}
                 alt=""
                 className="size-20 shrink-0 rounded-full object-cover ring-4 ring-card"
               />
               <div className="min-w-0 pb-1">
                 <p className="truncate text-xl font-semibold">{name}</p>
-                {user.primaryEmailAddress && (
+                {user.email && (
                   <p className="truncate text-sm text-muted-foreground">
-                    {user.primaryEmailAddress.emailAddress}
+                    {user.email}
                   </p>
                 )}
               </div>
             </div>
             <div className="flex shrink-0 gap-2">
-              <Button type="button" className="rounded-full" onClick={() => openUserProfile()}>
-                <GearSixIcon /> Manage account
-              </Button>
               <Button
                 type="button"
                 variant="outline"
                 className="rounded-full"
-                onClick={() => void signOut({ redirectUrl: "/sign-in" })}
+                onClick={() => void signOut({ fetchOptions: { onSuccess: () => router.replace("/sign-in") } })}
               >
                 <SignOutIcon /> Sign out
               </Button>

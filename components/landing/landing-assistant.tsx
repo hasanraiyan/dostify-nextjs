@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { useAuth } from "@clerk/nextjs";
+import { useSession } from "@/lib/auth-client";
 import { PersonaProvider } from "@personaai/react";
 import { AvatarSlotProvider } from "@/components/persona/avatar";
 import { VoiceFab } from "@/components/persona/chat-sdk";
@@ -11,11 +11,11 @@ import { DEFAULT_VOICE_AGENT_ID } from "@/app/agents";
 /**
  * The app's existing voice agent (same VoiceFab, agent and avatar as inside
  * the app) on the public home page. Renders nothing for signed-out visitors,
- * so the page stays static; it only mounts once Clerk confirms a session.
+ * so the page stays static; it only mounts once a session exists a session.
  */
 export function LandingAssistant() {
-  const { isLoaded, isSignedIn } = useAuth();
-  if (!isLoaded || !isSignedIn) return null;
+  const { data: session } = useSession();
+  if (!session) return null;
   return <SignedInVoiceFab />;
 }
 

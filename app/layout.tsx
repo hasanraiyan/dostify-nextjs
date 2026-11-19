@@ -5,7 +5,6 @@ import "./globals.css";
 
 import { cn } from "@/lib/utils";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { ClerkProvider } from "@clerk/nextjs";
 import { THEME_INIT_SCRIPT } from "@/lib/dostify/theme";
 import {
   SITE_DESCRIPTION,
@@ -98,7 +97,6 @@ export default function RootLayout({
   children,
 }: LayoutProps<"/">) {
   return (
-    <ClerkProvider>
       <html
         lang="en"
         // The theme script adds `dark` before React hydrates.
@@ -136,6 +134,5 @@ export default function RootLayout({
           /> */}
         </body>
       </html>
-    </ClerkProvider>
   );
 }

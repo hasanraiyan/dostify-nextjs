@@ -14,7 +14,6 @@ import {
   TreeStructureIcon,
 } from "@phosphor-icons/react";
 import { PersonaProvider } from "@personaai/react";
-import { UserButton } from "@clerk/nextjs";
 import { PersonaChatFab, PersonaFrontendTools } from "@/components/persona/chat-sdk";
 import { AvatarSlotProvider } from "@/components/persona/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -83,7 +82,6 @@ export function AssistantExperience() {
               Full chat
               <ArrowRightIcon />
             </Link>
-            <UserButton />
           </div>
         </header>
 

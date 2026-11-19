@@ -1,7 +1,6 @@
 import { z } from 'zod'
 import type { createMcpHandler } from 'mcp-handler'
 import { prisma } from '@/lib/prisma'
-import { syncClerkUser } from '@/lib/sync-user'
 import {
   countEntries,
   createEntry,
@@ -16,15 +15,13 @@ type McpServer = Parameters<Parameters<typeof createMcpHandler>[0]>[0]
 
 type Ctx = { http?: { authInfo?: { extra?: Record<string, unknown> } } }
 
-/** Resolves the signed-in Clerk user to our DB user id. Every query is scoped to it. */
+/** The OAuth-authenticated user's id (the token's `sub`). Every query is scoped to it. */
 async function requireUserId(ctx: Ctx): Promise<string> {
-  const clerkId = ctx.http?.authInfo?.extra?.userId
-  if (typeof clerkId !== 'string' || !clerkId) throw new Error('Not signed in.')
-  const existing = await prisma.user.findUnique({ where: { clerkId }, select: { id: true } })
-  if (existing) return existing.id
-  const synced = await syncClerkUser(clerkId)
-  if (!synced) throw new Error('Could not load your account.')
-  return synced.id
+  const userId = ctx.http?.authInfo?.extra?.userId
+  if (typeof userId !== 'string' || !userId) throw new Error('Not signed in.')
+  const existing = await prisma.user.findUnique({ where: { id: userId }, select: { id: true } })
+  if (!existing) throw new Error('Could not load your account.')
+  return existing.id
 }
 
 const ok = (data: unknown) => ({

@@ -1,16 +1,16 @@
-import { clerkMiddleware } from "@clerk/nextjs/server";
+import { getSessionCookie } from "better-auth/cookies";
+import { NextResponse, type NextRequest } from "next/server";
 
-// Public paths: the landing page and its SEO files, Clerk auth pages, SSO
-// callback, and MCP/OAuth endpoints. The app itself (/chat, /journal,
+// Public paths: the landing page and its SEO files, auth pages, auth API, and MCP/OAuth endpoints. The app itself (/chat, /journal,
 // /connectors, /profile) stays behind sign-in.
 const PUBLIC_EXACT = ["/", "/robots.txt", "/sitemap.xml", "/opengraph-image", "/twitter-image"];
 
 const PUBLIC_PREFIXES = [
   "/sign-in",
   "/sign-up",
-  "/sso-callback",
+  "/consent",
+  "/api/auth",
   "/.well-known",
-  "/api/webhooks",
   "/api/health",
   "/api/persona",
   "/mcp",
@@ -24,14 +24,15 @@ function isPublicPath(pathname: string) {
   );
 }
 
-export default clerkMiddleware(async (auth, request) => {
-  if (isPublicPath(request.nextUrl.pathname)) return;
-
-  // Optimistic redirect only — authoritative check happens in
-  // the route handler via `auth()`.
-  const { isAuthenticated, redirectToSignIn } = await auth();
-  if (!isAuthenticated) return redirectToSignIn();
-});
+// Optimistic check only (cookie present). Pages and route handlers verify the
+// session for real via `getUserId()`.
+export default function proxy(request: NextRequest) {
+  if (isPublicPath(request.nextUrl.pathname)) return NextResponse.next();
+  if (getSessionCookie(request)) return NextResponse.next();
+  const url = new URL("/sign-in", request.url);
+  url.searchParams.set("redirect", request.nextUrl.pathname + request.nextUrl.search);
+  return NextResponse.redirect(url);
+}
 
 export const config = {
   matcher: [

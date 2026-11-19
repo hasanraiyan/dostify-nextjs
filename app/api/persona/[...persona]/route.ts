@@ -1,4 +1,4 @@
-import { auth } from "@clerk/nextjs/server";
+import { getUserId } from "@/lib/session";
 import { createPersonaHandler } from "@personaai/adapters/nextjs/server";
 import {
   LIMIT_MESSAGES,
@@ -14,8 +14,7 @@ const personaHandler = createPersonaHandler({
   resolveUserFrom: async () => {
     // Both chat and voice are strictly restricted to authenticated users only.
     // Returning null causes the runtime to reject unauthenticated requests with 401 Unauthorized.
-    const { userId } = await auth();
-    return userId ?? null;
+    return await getUserId();
   },
   forwardTraceparent: true,
   defaultEnvironment: "production",
@@ -64,7 +63,7 @@ async function withLimits(
   const isVoice = request.method === "POST" && path === "/voice/sessions";
   if (!isChat && !isVoice) return handler(request, ctx as never);
 
-  const { userId } = await auth();
+  const userId = await getUserId();
   if (!userId) return handler(request, ctx as never);
 
   try {
