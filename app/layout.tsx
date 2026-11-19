@@ -3,6 +3,8 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono, Inter, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 
+import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import { cn } from "@/lib/utils";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { THEME_INIT_SCRIPT } from "@/lib/dostify/theme";
@@ -122,6 +124,8 @@ export default function RootLayout({
           <TooltipProvider>
             {children}
           </TooltipProvider>
+          <Analytics />
+          <SpeedInsights />
 
           {/* <anam-agent
             agent-id="92fa58a4-bd6c-41e3-9b56-8c0798d4be00"

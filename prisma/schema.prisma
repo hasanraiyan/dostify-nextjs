@@ -137,8 +137,8 @@ model OauthClient {
   skipConsent                      Boolean?
   enableEndSession                 Boolean?
   subjectType                      String?
-  scopes                           String[]
-  clientCredentialsScopes          String[]
+  scopes                           Json?
+  clientCredentialsScopes          Json?
   userId                           String?
   user                             User?                 @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt                        DateTime?             @default(now())
@@ -146,22 +146,22 @@ model OauthClient {
   name                             String?
   uri                              String?
   icon                             String?
-  contacts                         String[]
+  contacts                         Json?
   tos                              String?
   policy                           String?
   softwareId                       String?
   softwareVersion                  String?
   softwareStatement                String?
   redirectUris                     String[]
-  postLogoutRedirectUris           String[]
+  postLogoutRedirectUris           Json?
   backchannelLogoutUri             String?
   backchannelLogoutSessionRequired Boolean?
   tokenEndpointAuthMethod          String?
   applicationType                  String?
   jwks                             String?
   jwksUri                          String?
-  grantTypes                       String[]
-  responseTypes                    String[]
+  grantTypes                       Json?
+  responseTypes                    Json?
   requirePKCE                      Boolean?
   dpopBoundAccessTokens            Boolean?
   referenceId                      String?
@@ -180,7 +180,7 @@ model OauthResource {
   refreshTokenTtl               Int?
   signingAlgorithm              String?
   signingKeyId                  String?
-  allowedScopes                 String[]
+  allowedScopes                 Json?
   customClaims                  Json?
   dpopBoundAccessTokensRequired Boolean?
   disabled                      Boolean?
@@ -212,8 +212,8 @@ model OauthRefreshToken {
   user                    User               @relation(fields: [userId], references: [id], onDelete: Cascade)
   referenceId             String?
   authorizationCodeId     String?
-  resources               String[]
-  requestedUserInfoClaims String[]
+  resources               Json?
+  requestedUserInfoClaims Json?
   expiresAt               DateTime
   createdAt               DateTime           @default(now())
   revoked                 DateTime?
@@ -237,8 +237,8 @@ model OauthAccessToken {
   user                    User?              @relation(fields: [userId], references: [id], onDelete: Cascade)
   referenceId             String?
   authorizationCodeId     String?
-  resources               String[]
-  requestedUserInfoClaims String[]
+  resources               Json?
+  requestedUserInfoClaims Json?
   refreshId               String?
   refresh                 OauthRefreshToken? @relation(fields: [refreshId], references: [id], onDelete: Cascade)
   expiresAt               DateTime
@@ -255,8 +255,8 @@ model OauthConsent {
   userId                  String?
   user                    User?       @relation(fields: [userId], references: [id], onDelete: Cascade)
   referenceId             String?
-  resources               String[]
-  requestedUserInfoClaims String[]
+  resources               Json?
+  requestedUserInfoClaims Json?
   scopes                  String[]
   createdAt               DateTime    @default(now())
   updatedAt               DateTime    @updatedAt
