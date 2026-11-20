@@ -1,3 +1,4 @@
+import { VOICE_PROACTIVE_GREETING } from "@/lib/dostify/voice-greeting";
 import type { PersonaMessage, PersonaToolCall, PersonaSubagentActivityEntry } from "@personaai/react";
 
 export interface GroupedMessage {
@@ -7,19 +8,27 @@ export interface GroupedMessage {
 }
 
 /**
+ * The app sends a greeting prompt to the voice agent so it speaks first. Persona saves it as a
+ * user message, so it would show up in the chat history as if the person had said it.
+ */
+function isGreetingTrigger(msg: PersonaMessage): boolean {
+  return msg.role === "user" && msg.content?.trim() === VOICE_PROACTIVE_GREETING;
+}
+
+/**
  * Groups the SDK's flat `messages` array (reasoning phases as their own
  * `role:"reasoning"` entries, in stream order — the wire protocol's shape)
  * into pairs the visual layer can render: each assistant message paired
  * with the reasoning phases that preceded it. `message` is always the real
  * `PersonaMessage`, untouched — `reasoningPhases` is a sibling, not a field
- * grafted onto a copy of it. System messages are dropped.
+ * grafted onto a copy of it. System messages and the voice greeting prompt are dropped.
  */
 export function groupReasoning(messages: PersonaMessage[]): GroupedMessage[] {
   const result: GroupedMessage[] = [];
   let pending: PersonaMessage[] = [];
 
   for (const msg of messages) {
-    if (msg.role === "system") continue;
+    if (msg.role === "system" || isGreetingTrigger(msg)) continue;
 
     if (msg.role === "reasoning") {
       pending.push(msg);
