@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { usePathname, useRouter } from "next/navigation";
+import { VOICE_PROACTIVE_GREETING } from "@/lib/dostify/voice-greeting";
 import { useVoice, type UseVoiceResult } from "@personaai/react";
 import { VoiceDock } from "./voice-dock";
 import { useVoiceUsage } from "@/lib/dostify/use-voice-usage";
@@ -28,6 +29,7 @@ export function GlobalVoiceProvider({ children }: { children: React.ReactNode })
   const voice = useVoice({
     agentId: voiceAgentId,
     autoPrefetch: true,
+    proactiveGreeting: VOICE_PROACTIVE_GREETING,
   });
 
   useVoiceUsage(voice.state);

@@ -4,6 +4,7 @@ import * as React from "react";
 import { useSession } from "@/lib/auth-client";
 import { PersonaProvider } from "@personaai/react";
 import { AvatarSlotProvider } from "@/components/persona/avatar";
+import { VOICE_PROACTIVE_GREETING } from "@/lib/dostify/voice-greeting";
 import { VoiceFab } from "@/components/persona/chat-sdk";
 import { useAvatarPref } from "@/components/dostify/use-avatar-pref";
 import { DEFAULT_VOICE_AGENT_ID } from "@/app/agents";
@@ -28,6 +29,7 @@ function SignedInVoiceFab() {
           agentId={process.env.NEXT_PUBLIC_PERSONA_VOICE_AGENT_ID || DEFAULT_VOICE_AGENT_ID}
           pack={pack}
           avatarId={avatarId}
+          proactiveGreeting={VOICE_PROACTIVE_GREETING}
         />
       </AvatarSlotProvider>
     </PersonaProvider>

@@ -1,5 +1,6 @@
 "use client";
 
+import { VOICE_PROACTIVE_GREETING } from "@/lib/dostify/voice-greeting";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   useChat,
@@ -102,6 +103,7 @@ export function usePersonaChatWidget(options: UsePersonaChatWidgetOptions = {}) 
     agentVersion: voiceAgentVersion,
     environment: voiceEnvironment,
     autoPrefetch: !globalVoiceContext,
+    proactiveGreeting: VOICE_PROACTIVE_GREETING,
   });
 
   // The global provider reports its own calls; only report ours when it is absent.
