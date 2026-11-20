@@ -26,6 +26,7 @@ import { AVATAR_OPTIONS, type AvatarId } from "@/lib/dostify/avatar-config";
 import { useAvatarPref } from "@/components/dostify/use-avatar-pref";
 import { saveUserAvatarChoice } from "@/lib/dostify/avatar-actions";
 import { UsageCard } from "@/components/dostify/usage-card";
+import { DeleteAccount } from "@/components/dostify/delete-account";
 import { AnimeVoiceAvatar } from "@/components/persona/avatar";
 
 const THEMES: { value: ThemePref; label: string; icon: Icon }[] = [
@@ -237,6 +238,8 @@ export function ProfileView({
           </Link>
         ))}
       </div>
+
+      <DeleteAccount />
     </>
   );
 }

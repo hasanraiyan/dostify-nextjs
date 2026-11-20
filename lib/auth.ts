@@ -15,6 +15,8 @@ export const auth = betterAuth({
   // Cookie sessions work inside the Capacitor WebView because it loads this site
   // (same origin). The Android emulator's dev origin is allowed explicitly.
   trustedOrigins: [BASE_URL, "http://10.0.2.2:3000"],
+  // Account deletion from the profile page; the user's password is required.
+  user: { deleteUser: { enabled: true } },
   emailAndPassword: { enabled: true, minPasswordLength: 8, autoSignIn: true },
   // /token is replaced by the OAuth provider's own token endpoint.
   disabledPaths: ["/token"],
