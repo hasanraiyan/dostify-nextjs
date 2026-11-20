@@ -12,5 +12,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${SITE_URL}/sign-in`, lastModified: LANDING_UPDATED, changeFrequency: "yearly", priority: 0.4 },
     { url: `${SITE_URL}/terms`, lastModified: LANDING_UPDATED, changeFrequency: "yearly", priority: 0.2 },
     { url: `${SITE_URL}/privacy`, lastModified: LANDING_UPDATED, changeFrequency: "yearly", priority: 0.2 },
+    { url: `${SITE_URL}/delete-account`, lastModified: LANDING_UPDATED, changeFrequency: "yearly", priority: 0.2 },
   ];
 }
