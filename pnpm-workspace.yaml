@@ -6,7 +6,7 @@ allowBuilds:
   unrs-resolver: true
 minimumReleaseAgeExclude:
   - '@personaai/adapters@0.16.0 || 0.18.0'
-  - '@personaai/avatar@0.3.1'
+  - '@personaai/avatar@0.3.1 || 0.3.2'
   - '@personaai/react@0.28.0 || 0.30.0 || 0.31.0 || 0.31.7'
   - '@personaai/runtime@0.26.0 || 0.27.0'
   - '@personaai/sdk@0.29.0 || 0.32.0'

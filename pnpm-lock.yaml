@@ -191,8 +191,8 @@ importers:
         specifier: ^0.18.0
         version: 0.18.0(express@5.3.0(supports-color@7.2.0))(next@16.4.6(@babel/core@7.29.7(supports-color@7.2.0))(@types/node@20.19.43)(react-dom@19.3.1(react@19.3.1))(react@19.3.1))(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(zod@4.6.7)
       '@personaai/avatar':
-        specifier: ^0.3.1
-        version: 0.3.1(@personaai/react@0.31.7(react-dom@19.3.1(react@19.3.1))(react@19.3.1))(react@19.3.1)
+        specifier: ^0.3.2
+        version: 0.3.2(@personaai/react@0.31.7(react-dom@19.3.1(react@19.3.1))(react@19.3.1))(react@19.3.1)
       '@personaai/react':
         specifier: 0.31.7
         version: 0.31.7(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
@@ -1074,8 +1074,8 @@ packages:
       rxjs:
         optional: true
 
-  '@personaai/avatar@0.3.1':
-    resolution: {integrity: sha512-MqNf9Vz4+0wDMR25xPRfEnq9Qlqxl1B16nxToHYR8/4ZNX0ADMrJj6nhBF6LzAYl2NaeVCrHSj1xXdEHrgSmgA==}
+  '@personaai/avatar@0.3.2':
+    resolution: {integrity: sha512-j3SijcSlk9dYX1ffRYdUBD0lMJx5/6Jj3/63G2Rujjcba4Y8QfsaNwgyKc5gkmlOOQoPfa4Uee2t2bNzoZGbew==}
     engines: {node: '>=18'}
     hasBin: true
     peerDependencies:
@@ -5857,7 +5857,7 @@ snapshots:
       - react-dom
       - zod
 
-  '@personaai/avatar@0.3.1(@personaai/react@0.31.7(react-dom@19.3.1(react@19.3.1))(react@19.3.1))(react@19.3.1)':
+  '@personaai/avatar@0.3.2(@personaai/react@0.31.7(react-dom@19.3.1(react@19.3.1))(react@19.3.1))(react@19.3.1)':
     optionalDependencies:
       '@personaai/react': 0.31.7(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       react: 19.3.1
